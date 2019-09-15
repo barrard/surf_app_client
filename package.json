@@ -1,0 +1,25 @@
+{
+  "name": "surf_app_clien",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "NODE_ENV=production node ./src/server.js"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.4.2",
+    "@material-ui/icons": "^4.4.1",
+    "@material-ui/styles": "latest",
+    "@zeit/next-css": "^1.0.1",
+    "dotenv": "^8.1.0",
+    "google-maps-react": "^2.0.2",
+    "isomorphic-fetch": "^2.2.1",
+    "next": "9.0.5",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
+    "react-google-maps": "^9.4.5",
+    "styled-components": "^4.3.2",
+    "typeface-roboto": "0.0.75"
+  }
+}
