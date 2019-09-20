@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
-import GridExample from '../components/Grid/ExampleGrid.js'
+import GridExample from '../src/components/Grid/ExampleGrid.js'
 const Home = () => (
   <div>
     <Head>
