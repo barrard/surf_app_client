@@ -4,8 +4,11 @@ import Head from 'next/head';
 import { ThemeProvider } from '@material-ui/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import theme from '../src/theme';
-import AppBar from '../components/AppBar/AppBar.js'
+import AppBar from '../src/components/AppBar/AppBar.js'
+import BottomNavigation from '../src/components/BottomNav/BottomNav.js'
+// import 'leaflet/dist/leaflet.css'
 export default class MyApp extends App {
+
   componentDidMount() {
     console.log('app mounted')
     
@@ -22,6 +25,7 @@ export default class MyApp extends App {
           <CssBaseline />
           <Component {...pageProps} />
         {/* </ThemeProvider> */}
+        <BottomNavigation/>
       </React.Fragment>
     );
   }

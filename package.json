@@ -11,15 +11,23 @@
     "@material-ui/core": "^4.4.2",
     "@material-ui/icons": "^4.4.1",
     "@material-ui/styles": "latest",
+    "@react-google-maps/api": "^1.7.6",
     "@zeit/next-css": "^1.0.1",
     "dotenv": "^8.1.0",
     "google-maps-react": "^2.0.2",
     "isomorphic-fetch": "^2.2.1",
+    "leaflet": "^1.5.1",
+    "leaflet.markercluster": "^1.4.1",
+    "material-colors": "^1.2.6",
+    "material-ui-colors": "^1.0.0",
     "next": "9.0.5",
     "react": "16.9.0",
     "react-dom": "16.9.0",
-    "react-google-maps": "^9.4.5",
+    "react-leaflet": "^2.4.0",
     "styled-components": "^4.3.2",
     "typeface-roboto": "0.0.75"
+  },
+  "devDependencies": {
+    "babel-plugin-inline-import": "^3.0.0"
   }
 }

@@ -14,14 +14,7 @@ const Home = () => (
 
 
   {/* left for example */}
-    <style jsx>{`
-      {/* .hero {
-        width: 100%;
-        color: #333;
-      } */}
 
-      }
-    `}</style>
   </div>
 )
 

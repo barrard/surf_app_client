@@ -1,41 +1,53 @@
-import React, { Component, useEffect, useState } from "react";
-import Link from "next/link";
+import React, { Component, useEffect, useState, useRef } from "react";
+// import Link from "next/link";
 import Head from "next/head";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import { MyMap } from "../components/Maps/RGM.js";
-import { getUserLocation, useMarkers,
-  useLocation } from "../components/utilFunctions.js";
+// import Container from "@material-ui/core/Container";
+// import Grid from "@material-ui/core/Grid";
+// import { MyMap } from "../components/Maps/RGM.js";
+// import  MyMap from "../components/Maps/RGM_API.js";
+import  Leaf_map from "../src/components/Maps/Leaflet_Map.js";
+import lStyles from 'leaflet/dist/leaflet.css';
+
+// const Leaf_map = dynamic(import("../components/Maps/Leaflet_Map.js"), {
+//   ssr: false
+// });
+// import dynamic from "next/dynamic";
+
+import {
+  getUserLocation,
+  useBouys,
+  useLocation,
+  get_nearby_bouy_data
+} from "../src/components/utilFunctions.js";
 
 const Home = () => {
-  let [mapCenter, setMapCenter] = useLocation({
-    lat: 44.8338944, lng: -122.8435008
-  });
-  let [mapMarkers, setMapMarkers] = useMarkers([
-    { lat: 44.8338944, lng: -122.8435008 }
-  ]);
-  useEffect( () => {
-    getUserLocation({setMapCenter,
-      setMapMarkers, mapMarkers});
+  // const google = window.google;
 
+  let [userLocation, setUserLocation] = useLocation();
+  console.log({ userLocation });
+  let [bouyMarkers, setBouyMarkers] = useBouys({});
+  let map_ref = useRef(null)
+  useEffect(() => {
+    console.log("use efect");
+    getUserLocation({ setUserLocation, setBouyMarkers, bouyMarkers });
   }, []);
   return (
     <div>
       <Head>
         <title>Home</title>
       </Head>
+<Leaf_map latLng={userLocation} buoy_data={bouyMarkers}/>
+      {/* <MyMap
+        map_ref={map_ref}
+        markers={bouyMarkers}
+        center={userLocation}
+        handleLabelClick={console.log}
+        handleClick={e =>
+          get_buoy_data(e, setBouyMarkers, bouyMarkers, setUserLocation, map_ref)
+        }
+      /> */}
 
-      <MyMap markers={mapMarkers} center={mapCenter} />
 
-      {/* left for example */}
-      <style jsx>{`
-      {/* .hero {
-        width: 100%;
-        color: #333;
-      } */}
-
-      }
-    `}</style>
     </div>
   );
 };
@@ -60,3 +72,19 @@ export default Home;
 
 //   return{GAPI:process.env.GOOGLE}
 // }
+
+function get_buoy_data(e, setBouyMarkers, bouyMarkers, setUserLocation, map) {
+  console.log(map)
+  console.log({google})
+  console.log(google)
+  console.log(e.latLng.lat());
+  console.log(e.latLng.lng());
+  /* try pan zoom */
+  get_nearby_bouy_data(
+    e.latLng.lat(),
+    e.latLng.lng(),
+    setBouyMarkers,
+    bouyMarkers,
+    setUserLocation
+  );
+}
