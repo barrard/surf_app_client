@@ -60,12 +60,13 @@ export function create_markers(buoy_data, selection, map) {
 
     console.log(map);
     Object.keys(buoy_data).map(station_id => {
+        let latest_data = buoy_data[station_id]
       let currentData = buoy_data[station_id][0];
       /* if wave data selected  //TODO make wind one */
       let myIcon, popUp;
       if (selection === "wave_data") {
         myIcon = return_Wave_Icon(currentData);
-        popUp = return_wave_popUp(currentData)
+        popUp = return_wave_popUp(latest_data)
       }
       if (!myIcon) return;
       console.log(currentData);
@@ -75,11 +76,12 @@ export function create_markers(buoy_data, selection, map) {
   }
 }
 
-function return_wave_popUp(currentData){
-    let ft = (currentData.SwH);
-    let sec = (currentData.SwP);  
+function return_wave_popUp(latest_data){
+    let currentData = latest_data[0];
+
+
       let popUp = ReactDOMServer.renderToString(
-        <Data_popup text={`${ft} ft. @ ${sec} sec.`}/>
+        <Data_popup latest_data={latest_data}/>
       )
       return popUp
 }
@@ -131,10 +133,66 @@ function colorFt(height) {
 }
 
 
-function Data_popup({text}){
-    return (
-        <p>
-            {text}
-        </p>
-    )
+function Data_popup({ latest_data}){
+    /* time stamp data */
+    return <>
+            <p>Station ID:{latest_data[0].ID}</p>
+
+        <p>{convert_GMT_hours(latest_data[0].TIME).date_string}</p>
+        {
+            latest_data.map((data)=>(
+                
+                <p>{`${convert_GMT_hours(data.TIME).time_string} ${data.SwH} ft. @ ${data.SwP} sec. ${data.SwD}`}</p>
+            ))
+        }
+    </>
+
+
+
+
+
+    
+}
+
+
+function convert_GMT_hours(GMT_hour_timestamp){//0700 should return 900PM hawaii
+/* if time is 530, we need it to be 0530 */
+    GMT_hour_timestamp = process_GMT_timestamp(GMT_hour_timestamp)
+    let hour = GMT_hour_timestamp.slice(0, 2)
+    let minute = GMT_hour_timestamp.slice(2, 4)
+    let offset = new Date().getTimezoneOffset() /60
+
+    let GMT_date_string = new Date().toGMTString()
+
+    let GMT_day = new Date(GMT_date_string).getUTCDate()
+    // let GMT_hour = new Date(GMT_date_string).getUTCHours()
+    let GMT_month = new Date(GMT_date_string).getUTCMonth()//0-11
+    let GMT_year = new Date(GMT_date_string).getUTCFullYear()
+    console.log({
+         GMT_day, GMT_month, GMT_year
+    })
+
+    let tmp_date = new Date(GMT_year, GMT_month, GMT_day, hour, minute)
+    tmp_date= tmp_date.setHours(tmp_date.getHours() - offset)
+    // console.log(tmp_date)
+    // console.log(new Date(tmp_date))
+    //  console.log(tmp_date.toLocaleDateString())
+    let date_string = new Date(tmp_date).toDateString()
+    let time_string = new Date(tmp_date).toLocaleTimeString()
+    return {date_string, time_string}
+
+
+}
+ 
+function process_GMT_timestamp(time){
+    time = String(time)
+    if(time.length===3){
+        time = time.split('')
+        time.unshift('0')
+        time = time.join('')
+    }
+
+
+    return time
+
 }
