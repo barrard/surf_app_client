@@ -22,7 +22,7 @@ class MyDocument extends Document {
           <link rel="stylesheet" href="/static/css/weather-icons-wind.min.css" />
           <link rel="stylesheet" href="/static/css/weather-icons.min.css" />
           <link rel="stylesheet" href="/static/css/leaflet.css" />
-          <link rel="stylesheet" href="/static/css/MarkerCluster.css" />
+          {/* <link rel="stylesheet" href="/static/css/MarkerCluster.css" /> */}
           <link rel="stylesheet" href="/static/css/icomoon.css" />
           <link rel="stylesheet" href="/static/css/css.css" />
         </Head>

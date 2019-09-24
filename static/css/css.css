@@ -16,6 +16,10 @@
   
 }
 
+.large-icons i{
+  font-size: 20px
+}
+
 .transparent{
   background: linear-gradient(#eee, #333);
   -webkit-background-clip: text;

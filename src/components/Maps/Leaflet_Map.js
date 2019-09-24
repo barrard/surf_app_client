@@ -1,27 +1,27 @@
 import React from 'react';
-import getMap from './getMap';
-import {add_buoy_markers} from './getMap.js'
+import getMap, {add_buoy_markers, add_circle} from './getMap';
+
+
 
 
 class Leaflet_Map extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      map:null
+      map:null,
+      all_markers:{}
     }
   }
   componentDidMount() {
     console.log(this.props)
-    let {lat, lng} = this.props.latLng
-    const map = getMap({lat, lng});
+    const map = getMap(this.props.handleClick);
     this.setState({map})
   }
 
   componentDidUpdate(a, b){
     let {map} = this.state
+    console.log(this.props)
 
-    console.log({a,b})
-    let {lat, lng} = a.latLng
     let {buoy_data} = this.props
     if(buoy_data){
       console.log(buoy_data)
@@ -31,8 +31,17 @@ class Leaflet_Map extends React.Component {
   }
   render() {
     let {map} = this.state
-    let {lat,lng} = this.props.latLng
-    if(map)map.flyTo([lat, lng], 6)
+    
+    if(map){
+      if(!this.props.latLng){
+        map.flyTo([0, 0], 2)
+        
+      }else
+      {let {lat,lng} = this.props.latLng
+      map.flyTo([lat, lng], 6)
+      /* draw circle */
+     add_circle([lat, lng], map)}
+    }
 
     return (
       <div id='map' style={{
