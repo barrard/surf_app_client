@@ -1,30 +1,30 @@
-import React from "react";
-import Document, { Head, Main, NextScript } from "next/document";
-import { ServerStyleSheets } from "@material-ui/styles";
-import theme from "../src/theme";
+import React from 'react'
+import Document, { Head, Main, NextScript } from 'next/document'
+import { ServerStyleSheets } from '@material-ui/styles'
+import theme from '../src/theme'
 
 class MyDocument extends Document {
-  render() {
+  render () {
     return (
-      <html lang="en">
+      <html lang='en'>
         <Head>
-          <meta charSet="utf-8" />
+          <meta charSet='utf-8' />
           <meta
-            name="viewport"
-            content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
+            name='viewport'
+            content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no'
           />
           {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
+          <meta name='theme-color' content={theme.palette.primary.main} />
           <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+            rel='stylesheet'
+            href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap'
           />
-          <link rel="stylesheet" href="/static/css/weather-icons-wind.min.css" />
-          <link rel="stylesheet" href="/static/css/weather-icons.min.css" />
-          <link rel="stylesheet" href="/static/css/leaflet.css" />
+          <link rel='stylesheet' href='/static/css/weather-icons-wind.min.css' />
+          <link rel='stylesheet' href='/static/css/weather-icons.min.css' />
+          <link rel='stylesheet' href='/static/css/leaflet.css' />
           {/* <link rel="stylesheet" href="/static/css/MarkerCluster.css" /> */}
-          <link rel="stylesheet" href="/static/css/icomoon.css" />
-          <link rel="stylesheet" href="/static/css/css.css" />
+          <link rel='stylesheet' href='/static/css/icomoon.css' />
+          <link rel='stylesheet' href='/static/css/css.css' />
         </Head>
         <body>
           <Main />
@@ -32,7 +32,7 @@ class MyDocument extends Document {
           {/* <script src="/static/js/leaflet.markercluster.js"></script> */}
         </body>
       </html>
-    );
+    )
   }
 }
 
@@ -60,26 +60,26 @@ MyDocument.getInitialProps = async ctx => {
   // 4. page.render
 
   // Render app and page and get the context of the page with collected side effects.
-  const sheets = new ServerStyleSheets();
-  const originalRenderPage = ctx.renderPage;
+  const sheets = new ServerStyleSheets()
+  const originalRenderPage = ctx.renderPage
 
   ctx.renderPage = () =>
     originalRenderPage({
       enhanceApp: App => props => sheets.collect(<App {...props} />)
-    });
+    })
 
-  const initialProps = await Document.getInitialProps(ctx);
+  const initialProps = await Document.getInitialProps(ctx)
 
   return {
     ...initialProps,
     // Styles fragment is rendered after the app and page rendering finish.
     styles: [
-      <React.Fragment key="styles">
+      <React.Fragment key='styles'>
         {initialProps.styles}
         {sheets.getStyleElement()}
       </React.Fragment>
     ]
-  };
-};
+  }
+}
 
-export default MyDocument;
+export default MyDocument

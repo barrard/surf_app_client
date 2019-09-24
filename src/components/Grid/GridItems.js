@@ -1,52 +1,55 @@
-import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import styled from "styled-components";
-import Checkbox from "@material-ui/core/Checkbox";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormGroup from "@material-ui/core/FormGroup";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Button from "@material-ui/core/Button";
-import Badge from "@material-ui/core/Badge";
-import IconButton from "@material-ui/core/IconButton";
-import HighlightOffTwoToneIcon from "@material-ui/icons/HighlightOffTwoTone";
-import AddBoxTwoToneIcon from "@material-ui/icons/AddBoxTwoTone";
-import CropLandscapeTwoToneIcon from "@material-ui/icons/CropLandscapeTwoTone";
+import React, { useState, useEffect } from 'react'
+import { makeStyles } from '@material-ui/core/styles'
+import Container from '@material-ui/core/Container'
+import Grid from '@material-ui/core/Grid'
+import Checkbox from '@material-ui/core/Checkbox'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import FormGroup from '@material-ui/core/FormGroup'
+import FormControl from '@material-ui/core/FormControl'
+import Select from '@material-ui/core/Select'
+import InputLabel from '@material-ui/core/InputLabel'
+import MenuItem from '@material-ui/core/MenuItem'
+import Button from '@material-ui/core/Button'
+import Badge from '@material-ui/core/Badge'
+import IconButton from '@material-ui/core/IconButton'
+import HighlightOffTwoToneIcon from '@material-ui/icons/HighlightOffTwoTone'
+import AddBoxTwoToneIcon from '@material-ui/icons/AddBoxTwoTone'
+import CropLandscapeTwoToneIcon from '@material-ui/icons/CropLandscapeTwoTone'
+import PropTypes from 'prop-types'
 
-const posRel = { position: "relative" };
+const posRel = { position: 'relative' }
 const GridStyles = {
   MainContainer: {
-    border: "red solid 3px"
+    border: 'red solid 3px'
   },
   GridContainer: {
-    border: "blue solid 2px"
+    border: 'blue solid 2px'
   },
   GridItem: {
-    border: "green solid 1px"
+    border: 'green solid 1px'
   },
   ItemContainer: {
-    border: "brown solid 2px"
+    border: 'brown solid 2px'
   }
-};
+}
 const useStyles = makeStyles(theme => ({
   zeroPad: { padding: 0 },
   topRight: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0
   },
   ...GridStyles
-}));
-const getColor = style => style.border.split(" ")[0];
+}))
+const getColor = style => style.border.split(' ')[0]
 const ColoredP = ({ style }) => (
   <span style={{ color: getColor(style) }}>{getColor(style)}</span>
-);
-export function GridKey() {
-  let { MainContainer, GridContainer, ItemContainer, GridItem } = GridStyles;
+)
+ColoredP.propTypes = {
+  style: PropTypes.string.isRequired
+}
+export function GridKey () {
+  const { MainContainer, GridContainer, ItemContainer, GridItem } = GridStyles
   return (
     <div>
       <p>
@@ -62,20 +65,20 @@ export function GridKey() {
         The Item Container border is <ColoredP style={ItemContainer} />
       </p>
     </div>
-  );
+  )
 }
 
-export function Contain({ children }) {
-  console.log(children);
-  const classes = useStyles();
-  let [fixed, setFixed] = useState(true);
-  let [maxWidth, setMaxWidth] = useState("xl");
-  let [childItems, setChildItems] = useChildItems(children);
-  let containerRef = React.createRef();
+export function Contain ({ children }) {
+  console.log(children)
+  const classes = useStyles()
+  const [fixed, setFixed] = useState(true)
+  const [maxWidth, setMaxWidth] = useState('xl')
+  const [childItems, setChildItems] = useChildItems(children)
+  const containerRef = React.createRef()
 
   const remove = () => {
-    containerRef.current.remove();
-  };
+    containerRef.current.remove()
+  }
   console.log(childItems, setChildItems)
 
   return (
@@ -91,46 +94,52 @@ export function Contain({ children }) {
           fixed={fixed}
           setMaxWidth={setMaxWidth}
           setFixed={setFixed}
-          useChild={{setChildItems, childItems}}
+          useChild={{ setChildItems, childItems }}
           remove={remove}
         />
       </Grid>
       {childItems}
     </Container>
-  );
+  )
+}
+Contain.propTypes = {
+  children: PropTypes.obj.isRequired
 }
 
-export function GridItem({ children }) {
-  console.log(children);
+export function GridItem ({ children }) {
+  console.log(children)
 
-  let [item, setItem] = useState(true);
-  let [container, setContainer] = useState(false);
-  let [size, setSize] = useState(12);
-  let [spacing, setSpacing] = useState(0);
-  let [childItems, setChildItems] = useChildItems(children);
+  const [item, setItem] = useState(true)
+  const [container, setContainer] = useState(false)
+  const [size, setSize] = useState(12)
+  const [spacing, setSpacing] = useState(0)
+  const [childItems, setChildItems] = useChildItems(children)
 
-  let itemRef = React.createRef();
+  const itemRef = React.createRef()
   const borderStyle = (i, c) => {
-    if (i && !c)
-      return { border: `green solid ${childItems.length + 1}px` };
-    if (!i && c)
-      return { border: `blue solid ${childItems.length + 1}px` };
-    if (i && c)
-      return { border: `brown solid ${childItems.length + 1}px` };
-  };
-  let elProps = () => {
+    if (i && !c) {
+      return { border: `green solid ${childItems.length + 1}px` }
+    }
+    if (!i && c) {
+      return { border: `blue solid ${childItems.length + 1}px` }
+    }
+    if (i && c) {
+      return { border: `brown solid ${childItems.length + 1}px` }
+    }
+  }
+  const elProps = () => {
     let props = {
       item: item,
       container: container
-    };
-    if (item) props = { ...props, xs: size };
-    if (container) props = { ...props, spacing: spacing };
-    return props;
-  };
+    }
+    if (item) props = { ...props, xs: size }
+    if (container) props = { ...props, spacing: spacing }
+    return props
+  }
 
   const remove = () => {
-    itemRef.current.remove();
-  };
+    itemRef.current.remove()
+  }
 
   return (
     <Grid
@@ -141,7 +150,7 @@ export function GridItem({ children }) {
       <GridItemControls
         spacing={spacing}
         setSpacing={setSpacing}
-        addChild={{setChildItems, childItems}}
+        addChild={{ setChildItems, childItems }}
         remove={remove}
         size={size}
         setSize={setSize}
@@ -152,10 +161,13 @@ export function GridItem({ children }) {
       />
       {childItems}
     </Grid>
-  );
+  )
+}
+GridItem.propTypes = {
+  children: PropTypes.obj.isRequired
 }
 
-function GridItemControls({
+function GridItemControls ({
   spacing,
   setSpacing,
   addChild,
@@ -169,7 +181,7 @@ function GridItemControls({
 }) {
   console.log(addChild)
   return (
-    <Grid container justify="space-around">
+    <Grid container justify='space-around'>
       <AddRemoveBtns addChild={addChild} remove={remove} />
       {item && <SizeSelect val={size} setVal={setSize} />}
       {container && <SpacingSelect val={spacing} setVal={setSpacing} />}
@@ -180,46 +192,60 @@ function GridItemControls({
         setContainer={setContainer}
       />
     </Grid>
-  );
+  )
+}
+GridItemControls.propTypes = {
+  spacing: PropTypes.number.isRequired,
+  setSpacing: PropTypes.func.isRequired,
+  addChild: PropTypes.func.isRequired,
+  remove: PropTypes.func.isRequired,
+  size: PropTypes.number.isRequired,
+  setSize: PropTypes.func.isRequired,
+  container: PropTypes.object.isRequired,
+  item: PropTypes.object.isRequired,
+  setItem: PropTypes.func.isRequired,
+  setContainer: PropTypes.func.isRequired
 }
 
-export function AddRemoveBtns({ addChild,remove }) {
-  const classes = useStyles();
-  console.log(addChild)
-  let {setChildItems, childItems} = addChild
-
+export function AddRemoveBtns ({ addChild, remove }) {
+  const classes = useStyles()
+  const { setChildItems, childItems } = addChild
 
   return (
     <div className={classes.topRight}>
       <IconButton
-        onClick={() => add(setChildItems, childItems, "container")}
+        onClick={() => add(setChildItems, childItems, 'container')}
         className={classes.zeroPad}
-        aria-label="Add Container"
+        aria-label='Add Container'
       >
-        <CropLandscapeTwoToneIcon htmlColor={"goldenrod"} fontSize={"small"} />
+        <CropLandscapeTwoToneIcon htmlColor='goldenrod' fontSize='small' />
       </IconButton>
 
       <IconButton
-        onClick={() => add(setChildItems, childItems, "item")}
+        onClick={() => add(setChildItems, childItems, 'item')}
         className={classes.zeroPad}
-        aria-label="plus"
+        aria-label='plus'
       >
-        <AddBoxTwoToneIcon htmlColor={"green"} fontSize={"small"} />
+        <AddBoxTwoToneIcon htmlColor='green' fontSize='small' />
       </IconButton>
       {remove && (
         <IconButton
           onClick={remove}
           className={classes.zeroPad}
-          aria-label="delete"
+          aria-label='delete'
         >
-          <HighlightOffTwoToneIcon htmlColor={"red"} fontSize={"small"} />
+          <HighlightOffTwoToneIcon htmlColor='red' fontSize='small' />
         </IconButton>
       )}
     </div>
-  );
+  )
+}
+AddRemoveBtns.propTypes = {
+  addChild: PropTypes.func.isRequired,
+  remove: PropTypes.func.isRequired
 }
 
-function ItemContainerCheckBoxes({ item, setItem, container, setContainer }) {
+function ItemContainerCheckBoxes ({ item, setItem, container, setContainer }) {
   return (
     <FormGroup row>
       <FormControlLabel
@@ -228,13 +254,13 @@ function ItemContainerCheckBoxes({ item, setItem, container, setContainer }) {
             disabled={!container}
             checked={item}
             onChange={() => setItem(!item)}
-            value="item"
+            value='item'
             inputProps={{
-              "aria-label": "item checkbox"
+              'aria-label': 'item checkbox'
             }}
           />
         }
-        label="Item"
+        label='Item'
       />
 
       <FormControlLabel
@@ -243,20 +269,26 @@ function ItemContainerCheckBoxes({ item, setItem, container, setContainer }) {
             disabled={!item}
             checked={container}
             onChange={() => setContainer(!container)}
-            value="grid"
-            color="primary"
+            value='grid'
+            color='primary'
             inputProps={{
-              "aria-label": "container checkbox"
+              'aria-label': 'container checkbox'
             }}
           />
         }
-        label="Container"
+        label='Container'
       />
     </FormGroup>
-  );
+  )
+}
+ItemContainerCheckBoxes.propTypes = {
+  item: PropTypes.bool.isRequired,
+  container: PropTypes.object.isRequired,
+  setContainer: PropTypes.func.isRequired,
+  setItem: PropTypes.func.isRequired
 }
 
-function MainContainerControls({
+function MainContainerControls ({
   maxWidth,
   setMaxWidth,
   fixed,
@@ -264,7 +296,7 @@ function MainContainerControls({
   useChild,
   remove
 }) {
-  const isFixed = fixed => (fixed ? "Fixed" : "Fluid");
+  const isFixed = fixed => (fixed ? 'Fixed' : 'Fluid')
   const useStyles = makeStyles(theme => ({
     margin: {
       margin: theme.spacing(2)
@@ -272,16 +304,16 @@ function MainContainerControls({
     padding: {
       padding: theme.spacing(0, 2)
     }
-  }));
-  const classes = useStyles();
+  }))
+  const classes = useStyles()
 
   return (
-    <Grid container justify="space-around">
+    <Grid container justify='space-around'>
       <Badge
         className={classes.margin}
         badgeContent={isFixed(fixed)}
-        color="secondary"
-      ></Badge>
+        color='secondary'
+      />
 
       <Button onClick={() => setFixed(!fixed)}>
         {`Set to ${isFixed(!fixed)}`}
@@ -289,22 +321,30 @@ function MainContainerControls({
       <MaxWidthSelect val={maxWidth} setVal={setMaxWidth} />
       <AddRemoveBtns addChild={useChild} remove={remove} />
     </Grid>
-  );
+  )
+}
+MainContainerControls.propTypes = {
+  maxWidth: PropTypes.number.isRequired,
+  setMaxWidth: PropTypes.func.isRequired,
+  fixed: PropTypes.bool.isRequired,
+  setFixed: PropTypes.func.isRequire,
+  useChild: PropTypes.func.isRequire,
+  remove: PropTypes.func.isRequire
 }
 
-function SizeSelect({ val, setVal }) {
-  const useStyles = makeStyles(theme => ({}));
-  const classes = useStyles();
+function SizeSelect ({ val, setVal }) {
+  const useStyles = makeStyles(theme => ({}))
+  const classes = useStyles()
 
   return (
     <FormControl className={classes.formControl}>
-      <InputLabel htmlFor="item-size">Size</InputLabel>
+      <InputLabel htmlFor='item-size'>Size</InputLabel>
       <Select
         value={val}
         onChange={e => setVal(e.target.value)}
         inputProps={{
-          name: "size",
-          id: "item-size"
+          name: 'size',
+          id: 'item-size'
         }}
       >
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((v, i) => (
@@ -314,21 +354,25 @@ function SizeSelect({ val, setVal }) {
         ))}
       </Select>
     </FormControl>
-  );
+  )
 }
-function SpacingSelect({ val, setVal }) {
-  const useStyles = makeStyles(theme => ({}));
-  const classes = useStyles();
+SizeSelect.propTypes = {
+  val: PropTypes.number.isRequired,
+  setVal: PropTypes.func.isRequired
+}
+function SpacingSelect ({ val, setVal }) {
+  const useStyles = makeStyles(theme => ({}))
+  const classes = useStyles()
 
   return (
     <FormControl className={classes.formControl}>
-      <InputLabel htmlFor="item-spacing">Spacing</InputLabel>
+      <InputLabel htmlFor='item-spacing'>Spacing</InputLabel>
       <Select
         value={val}
         onChange={e => setVal(e.target.value)}
         inputProps={{
-          name: "spacing",
-          id: "item-spacing"
+          name: 'spacing',
+          id: 'item-spacing'
         }}
       >
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((v, i) => (
@@ -338,52 +382,65 @@ function SpacingSelect({ val, setVal }) {
         ))}
       </Select>
     </FormControl>
-  );
+  )
 }
-function MaxWidthSelect({ val, setVal }) {
-  const useStyles = makeStyles(theme => ({}));
-  const classes = useStyles();
+SpacingSelect.propTypes = {
+  val: PropTypes.number.isRequired,
+  setVal: PropTypes.func.isRequired
+
+}
+function MaxWidthSelect ({ val, setVal }) {
+  const useStyles = makeStyles(theme => ({}))
+  const classes = useStyles()
 
   return (
     <FormControl className={classes.formControl}>
-      <InputLabel htmlFor="item-size">Size</InputLabel>
+      <InputLabel htmlFor='item-size'>Size</InputLabel>
       <Select
         value={val}
         onChange={e => setVal(e.target.value)}
         inputProps={{
-          name: "size",
-          id: "item-size"
+          name: 'size',
+          id: 'item-size'
         }}
       >
-        {["xs", "sm", "md", "lg", "xl"].map((v, i) => (
+        {['xs', 'sm', 'md', 'lg', 'xl'].map((v, i) => (
           <MenuItem value={v} key={i}>
             {v}
           </MenuItem>
         ))}
       </Select>
     </FormControl>
-  );
+  )
+}
+MaxWidthSelect.propTypes = {
+  val: PropTypes.number.isRequired,
+  setVal: PropTypes.func.isRequired
+
 }
 
-export function useChildItems(children) {
-  console.log(children);
+export function useChildItems (children) {
+  console.log(children)
 
-  let [childItems, setChildItems] = useState([]);
+  const [childItems, setChildItems] = useState([])
   useEffect(() => {
-    if (children)
-      if (Array.isArray(children))
+    if (children) {
+      if (Array.isArray(children)) {
         setChildItems([
           ...Array.from(children).map((child, key) => ({ ...child, key }))
-        ]);
-      else setChildItems([children]);
-  }, []);
+        ])
+      } else setChildItems([children])
+    }
+  }, [])
 
-  return [childItems, setChildItems];
+  return [childItems, setChildItems]
 }
 
-export function add(setChildItems, childItems, type) {
-  if (type == "item")
-    setChildItems([...childItems, <GridItem key={childItems.length + 1} />]);
-  if (type == "container")
-    setChildItems([...childItems, <Contain key={childItems.length + 1} />]);
+export function add (setChildItems, childItems, type) {
+  if (type === 'item') {
+    setChildItems([...childItems, <GridItem key={childItems.length + 1} />])
+  }
+  if (type === 'container') {
+    setChildItems([...childItems, <Contain key={childItems.length + 1} />])
+  }
 }

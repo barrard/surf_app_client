@@ -1,23 +1,31 @@
-import React from "react";
-import App from "next/app";
-import Head from "next/head";
-import { ThemeProvider } from "@material-ui/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import theme from "../src/theme";
-import AppBar from "../src/components/AppBar/AppBar.js";
-import BottomNavigation from "../src/components/BottomNav/BottomNav.js";
-import BottomNavContext from "../src/Context/BottomNavContext.js";
+import React from 'react'
+import App from 'next/app'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import AppBar from '../src/components/AppBar/AppBar.js'
+import BottomNavigation from '../src/components/BottomNav/BottomNav.js'
+import BottomNavContext from '../src/Context/BottomNavContext.js'
 export default class MyApp extends App {
-  componentDidMount() {
-    console.log("app mounted");
+  constructor (props) {
+    super(props)
+    this.state = {
+      bottomNavSetting: 0
+    }
   }
 
-  render() {
-    const { Component, pageProps } = this.props;
+  componentDidMount () {
+    console.log('app mounted')
+  }
+
+  setBottomNavSetting = val => this.setState({ bottomNavSetting: val });
+
+  render () {
+    const { Component, pageProps } = this.props
 
     return (
-        <BottomNavContext.Provider value={0}>
-      <React.Fragment>
+      <BottomNavContext.Provider
+        value={{ bottomNavSetting: this.state.bottomNavSetting, setBottomNavSetting: this.setBottomNavSetting }}
+      >
+        <>
           <AppBar />
           {/* <ThemeProvider theme={theme}> */}
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
@@ -25,8 +33,8 @@ export default class MyApp extends App {
           <Component {...pageProps} />
           {/* </ThemeProvider> */}
           <BottomNavigation />
-      </React.Fragment>
-        </BottomNavContext.Provider>
-    );
+        </>
+      </BottomNavContext.Provider>
+    )
   }
 }

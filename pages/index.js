@@ -1,15 +1,17 @@
-import React, { Component, useEffect, useState, useRef } from "react";
+import React, { useEffect } from 'react'
 // import Link from "next/link";
-import Head from "next/head";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
+import Head from 'next/head'
+import Container from '@material-ui/core/Container'
+// import Grid from '@material-ui/core/Grid'
 // import { MyMap } from "../components/Maps/RGM.js";
 // import  MyMap from "../components/Maps/RGM_API.js";
-import Leaf_map from "../src/components/Maps/Leaflet_Map.js";
-import lStyles from "leaflet/dist/leaflet.css";
-import { colors_legend } from "../src/components/colors/colors";
+import LeafMap from '../src/components/Maps/Leaflet_Map.js'
+// import lStyles from 'leaflet/dist/leaflet.css'
+import { colors_legend } from '../src/components/colors/colors'
+import BottomNavContext from '../src/Context/BottomNavContext.js'
+import PropTypes from 'prop-types'
 
-// const Leaf_map = dynamic(import("../components/Maps/Leaflet_Map.js"), {
+// const LeafMap = dynamic(import("../components/Maps/Leaflet_Map.js"), {
 //   ssr: false
 // });
 // import dynamic from "next/dynamic";
@@ -19,60 +21,70 @@ import {
   useBouys,
   useLocation,
   get_nearby_bouy_data
-} from "../src/components/utilFunctions.js";
+} from '../src/components/utilFunctions.js'
 
 const Home = () => {
   // const google = window.google;
 
-  let [userLocation, setUserLocation] = useLocation();
+  const [userLocation, setUserLocation] = useLocation()
   // console.log({ userLocation });
-  let [bouyMarkers, setBouyMarkers] = useBouys();
-  useEffect(()=> console.log({bouyMarkers}))
+  const [bouyMarkers, setBouyMarkers] = useBouys()
+  useEffect(() => console.log({ bouyMarkers }))
   useEffect(() => {
-    console.log("use efect");
-    getUserLocation({ setUserLocation });
-  }, []);
-  useEffect(()=>{
-    if(!userLocation)return
-    let {lat, lng} = userLocation
-    get_nearby_bouy_data(   lat,
+    console.log('use efect')
+    getUserLocation({ setUserLocation })
+  }, [])
+  useEffect(() => {
+    if (!userLocation) return
+    const { lat, lng } = userLocation
+    get_nearby_bouy_data(
+      lat,
       lng,
       bouyMarkers,
       setBouyMarkers,
-      setUserLocation)
+      setUserLocation
+    )
   }, [userLocation])
-  console.log({bouyMarkers})
+  console.log({ bouyMarkers })
 
-  const map_click = (e) => {
-    let { lat, lng } = e.latlng;
-    setUserLocation({lat, lng})
-
+  const map_click = e => {
+    const { lat, lng } = e.latlng
+    setUserLocation({ lat, lng })
   }
   // const get_buoy_data = (e)=> {
   //   let { lat, lng } = e.latlng;
   //   get_nearby_bouy_data(lat, lng,bouyMarkers, setBouyMarkers, setUserLocation);
   // }
-  
+
   return (
     <div>
       <Head>
         <title>Home</title>
       </Head>
-      <Leaf_map
-        latLng={userLocation}
-        buoy_data={bouyMarkers}
-        handleClick={map_click}
-      ></Leaf_map>
-      <Container>
-
-      {colors_legend()}
-      </Container>
-
+      <BottomNavContext.Consumer>
+        {props => {
+          console.log(props)
+          const { bottomNavSetting } = props
+          return (
+            <LeafMap
+              bottomNavSetting={bottomNavSetting}
+              latLng={userLocation}
+              buoy_data={bouyMarkers}
+              handleClick={map_click}
+            />
+          )
+        }}
+      </BottomNavContext.Consumer>
+      <Container>{colors_legend()}</Container>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+Home.propTypes = {
+  bottomNavSetting: PropTypes.number
+}
+
+export default Home
 
 // Home.getInitialProps = async(ctx)=>{
 
@@ -92,4 +104,3 @@ export default Home;
 
 //   return{GAPI:process.env.GOOGLE}
 // }
-

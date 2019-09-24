@@ -21,6 +21,7 @@
     "material-colors": "^1.2.6",
     "material-ui-colors": "^1.0.0",
     "next": "9.0.5",
+    "prop-types": "^15.7.2",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-leaflet": "^2.4.0",
@@ -29,6 +30,15 @@
     "typeface-roboto": "0.0.75"
   },
   "devDependencies": {
-    "babel-plugin-inline-import": "^3.0.0"
+    "babel-eslint": "^10.0.3",
+    "babel-plugin-inline-import": "^3.0.0",
+    "eslint": "^6.4.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-config-standard-react": "^9.2.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }

@@ -1,30 +1,24 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-
+import React from 'react'
 import {
   Contain,
   GridItem,
-  GridKey,
   AddRemoveBtns,
-  useChildItems,
-  add
-} from "./GridItems.js";
-import { Grid } from "@material-ui/core";
+  useChildItems
+} from './GridItems.js'
 
-export default function SimpleContainer() {
-  let [childItems, setChildItems] = useChildItems();
-
+export default function SimpleContainer () {
+  const [childItems, setChildItems] = useChildItems()
 
   return (
-    <div style={{ position: "relative" }}>
-      <br/>{/* needed to prevent main controls from overlapping */}
+    <div style={{ position: 'relative' }}>
+      <br />{/* needed to prevent main controls from overlapping */}
       <AddRemoveBtns
-        addChild={{setChildItems, childItems}}
+        addChild={{ setChildItems, childItems }}
       />
       <Contain>
-        <GridItem/>
-        </Contain>
-            {childItems}
+        <GridItem />
+      </Contain>
+      {childItems}
     </div>
-  );
+  )
 }

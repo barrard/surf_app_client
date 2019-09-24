@@ -1,31 +1,30 @@
-import React, { useRef } from "react";
-import Sortable from "sortablejs";
-import Head from "next/head";
-import {Colors_list} from '../src/components/colors/colors.js'
+import React from 'react'
+import Head from 'next/head'
+import { ColorsList } from '../src/components/colors/colors.js'
 class Colors extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
-    };
+
+    }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     // let el = document.getElementById("items");
     // var sortable = Sortable.create(el);
   }
 
-  render() {
+  render () {
     return (
       <div>
         <Head>
           <title>Colors</title>
         </Head>
 
-          <Colors_list/>
+        <ColorsList />
       </div>
-    );
+    )
   }
 }
 
-export default Colors;
-
+export default Colors

@@ -8,12 +8,9 @@ const Home = () => (
       <title>Home</title>
     </Head>
 
-    <GridExample>
+    <GridExample />
 
-    </GridExample>
-
-
-  {/* left for example */}
+    {/* left for example */}
 
   </div>
 )
