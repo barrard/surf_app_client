@@ -17,6 +17,7 @@
     "google-maps-react": "^2.0.2",
     "isomorphic-fetch": "^2.2.1",
     "leaflet": "^1.5.1",
+    "leaflet-geometryutil": "^0.9.1",
     "leaflet.markercluster": "^1.4.1",
     "material-colors": "^1.2.6",
     "material-ui-colors": "^1.0.0",

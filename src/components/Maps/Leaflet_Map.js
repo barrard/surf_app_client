@@ -14,8 +14,10 @@ class LeafletMap extends React.Component {
   }
 
   componentDidMount () {
+    const { handleClick } = this.props
+
     console.log(this.props)
-    const map = getMap(this.props.handleClick)
+    const map = getMap(handleClick)
     this.setState({ map })
   }
 

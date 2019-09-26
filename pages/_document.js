@@ -31,7 +31,7 @@ class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
-          {/* <script src="/static/js/leaflet.markercluster.js"></script> */}
+          {/* <script src='/static/js/leaflet.geometryutil.js' /> */}
         </body>
       </html>
     )

@@ -41,9 +41,7 @@ const Home = () => {
       lat,
       lng,
       bouyMarkers,
-      setBouyMarkers,
-      setUserLocation
-    )
+      setBouyMarkers)
   }, [userLocation])
   console.log({ bouyMarkers })
 
@@ -51,6 +49,7 @@ const Home = () => {
     const { lat, lng } = e.latlng
     setUserLocation({ lat, lng })
   }
+
   // const get_buoy_data = (e)=> {
   //   let { lat, lng } = e.latlng;
   //   get_nearby_bouy_data(lat, lng,bouyMarkers, setBouyMarkers, setUserLocation);
@@ -68,6 +67,7 @@ const Home = () => {
           return (
             <>
               <LeafMap
+                // useClick={[clicks, setClicks]}
                 bottomNavSetting={bottomNavSetting}
                 latLng={userLocation}
                 buoy_data={bouyMarkers}

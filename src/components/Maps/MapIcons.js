@@ -8,17 +8,16 @@ import PropTypes from 'prop-types'
 export const WindIcon = ({ color_gst, color_spd, direction, speed, size }) => {
   // console.log({ color_gst, color_spd, direction, speed, size })
   return (
-
     <>
-
       <StyledWindIcon
         size={size}
         color_gst={color_gst}
         color_spd={color_spd}
         className={`wi wi-wind wi-direction-${direction}`}
       >
-
-        <p style={{ margin: '0px' }} className='inline'>{speed}</p>
+        <p style={{ margin: '0px' }} className='inline'>
+          {speed}
+        </p>
       </StyledWindIcon>
     </>
   )
@@ -44,12 +43,15 @@ TempIcon.propTypes = {
 }
 
 export const WaveIcon = ({ color_ft, size_period, SwD }) => {
+  // console.log({ color_ft, size_period, SwD })
   return (
-    <StyledWaveDirectionIcon
-      color_ft={color_ft}
-      size_period={size_period}
-      className={`wi wi-wind wi-from-${SwD.toLowerCase()}`}
-    />
+    <StyledDiv>
+      <StyledWaveDirectionIcon
+        color_ft={color_ft}
+        size_period={size_period}
+        className={`wi wi-wind wi-from-${SwD.toLowerCase()}`}
+      />
+    </StyledDiv>
   )
 }
 WaveIcon.propTypes = {
@@ -57,11 +59,14 @@ WaveIcon.propTypes = {
   size_period: PropTypes.number.isRequired,
   SwD: PropTypes.string.isRequired
 }
-
+const StyledDiv = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-text-stroke-width: 1px;
+`
 const StyledWaveDirectionIcon = styled.i`
-position:absolute;
-top: 50%; left: 50%; 
-transform:translate(-50%, -50%);  -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: black;
   background: ${props => props.color_ft};
   -webkit-background-clip: text;
@@ -70,15 +75,16 @@ transform:translate(-50%, -50%);  -webkit-text-stroke-width: 1px;
   font-size: ${props => props.size_period + 'px'};
 `
 const StyledWindIcon = styled.i`
-font-weight:900;
-position:absolute;
-top: 50%; left: 50%; 
-transform:translate(-50%, -50%);
-/* padding: 3px; */
--webkit-text-stroke-width: 1px;
--webkit-text-stroke-color: black;
-background: linear-gradient(
-  ${props => `${props.color_spd}, ${props.color_gst}`}
+  font-weight: 900;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* padding: 3px; */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  background: linear-gradient(
+    ${props => `${props.color_spd}, ${props.color_gst}`}
   );
   -webkit-background-clip: text;
   background-clip: text;

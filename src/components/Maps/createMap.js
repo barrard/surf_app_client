@@ -6,10 +6,13 @@ import PropTypes from 'prop-types'
 import L, { Map, tileLayer, marker } from 'leaflet'
 /* eslint-disable */
 import markerClusterGroup from "leaflet.markercluster";
+
 /* eslint-enable */
 
 import { colors } from '../colors/colors'
 let map
+const clickRaduis = 250
+const metersPerNm = 1610
 export default function createMap (handleClick) {
   map = new Map('map').setView([0, 0], 1)
   var Esri_WorldImagery = tileLayer(
@@ -131,7 +134,6 @@ function return_wave_popUp (latest_data) {
   return popUp
 }
 function return_Wave_Icon (currentData) {
-  // console.log(currentData)
   if (
     isNaN(currentData.SwP) &&
     isNaN(currentData.SwH) &&
@@ -139,6 +141,7 @@ function return_Wave_Icon (currentData) {
   ) {
     return null
   }
+  // console.log(currentData)
   const color_ft = colorFt(
     currentData.SwH !== '-' ? currentData.SwH : currentData.WVHT
   )
@@ -237,14 +240,7 @@ function WindDataPopup ({ latest_data }) {
   /* time stamp data */
   return (
     <>
-      <p>
-        Station ID:
-        <a
-          href={`https://www.ndbc.noaa.gov/station_page.php?station=${latest_data[0].ID}`}
-        >
-          {latest_data[0].ID}
-        </a>
-      </p>
+      <StationIdLink id={latest_data[0].ID} />
 
       <p>{convert_GMT_hours(latest_data[0].TIME).date_string}</p>
       {latest_data.map((data, key) => (
@@ -269,14 +265,7 @@ function WaveDataPopup ({ latest_data }) {
   /* time stamp data */
   return (
     <>
-      <p>
-        Station ID:
-        <a
-          href={`https://www.ndbc.noaa.gov/station_page.php?station=${latest_data[0].ID}`}
-        >
-          {latest_data[0].ID}
-        </a>
-      </p>
+      <StationIdLink id={latest_data[0].ID} />
 
       <p>{convert_GMT_hours(latest_data[0].TIME).date_string}</p>
       {latest_data.map((data, key) => (
@@ -300,9 +289,10 @@ WaveDataPopup.propTypes = {
   ).isRequired
 }
 
+const cicleRadius = clickRaduis * metersPerNm
 export function add_circle ([lat, lng], map) {
   L.circle([lat, lng], {
-    radius: 250 * 1610,
+    radius: cicleRadius,
     fillOpacity: 0.0,
     interactive: false
   }).addTo(map)
@@ -335,4 +325,23 @@ function process_GMT_timestamp (time) {
   }
 
   return time
+}
+function StationIdLink ({ id }) {
+  return (
+    <p>
+          Station ID:
+      <a
+        target='_blank' rel='noopener noreferrer'
+        href={`https://www.ndbc.noaa.gov/station_page.php?station=${id}`}
+      >
+        {id}
+      </a>
+    </p>
+  )
+}
+StationIdLink.propTypes = {
+  id: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
+  ])
 }
