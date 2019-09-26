@@ -28,7 +28,7 @@ const Home = () => {
 
   const [userLocation, setUserLocation] = useLocation()
   // console.log({ userLocation });
-  const [bouyMarkers, setBouyMarkers] = useBouys()
+  const [bouyMarkers, setBouyMarkers] = useBouys([{}])
   useEffect(() => console.log({ bouyMarkers }))
   useEffect(() => {
     console.log('use efect')

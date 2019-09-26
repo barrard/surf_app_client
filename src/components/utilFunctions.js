@@ -1,8 +1,4 @@
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
-
-const L = dynamic(() => import('leaflet'))
-const GeometryUtil = dynamic(() => import('leaflet-geometryutil'))
 
 export function getUserLocation ({
   setUserLocation

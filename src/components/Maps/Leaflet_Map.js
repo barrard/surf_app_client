@@ -61,8 +61,8 @@ class LeafletMap extends React.Component {
 LeafletMap.propTypes = {
   bottomNavSetting: PropTypes.number.isRequired,
   handleClick: PropTypes.func.isRequired,
-  buoy_data: PropTypes.object.isRequired,
-  latLng: PropTypes.object.isRequired
+  buoy_data: PropTypes.object,
+  latLng: PropTypes.object
 }
 
 export default LeafletMap
