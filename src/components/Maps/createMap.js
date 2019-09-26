@@ -49,11 +49,13 @@ export default function createMap (handleClick) {
   return map
 }
 
-let mapMarkers = []
+let markersRef = null
 export function create_markers (buoy_data, selection, map) {
-  console.log({ mapMarkers })
+  console.log({ markersRef })
+  if (markersRef) map.removeLayer(markersRef)
+  markersRef = null
   var markers = L.markerClusterGroup({
-    maxClusterRadius: 0
+    maxClusterRadius: 20
   })
 
   if (Object.keys(buoy_data).length) {
@@ -64,25 +66,24 @@ export function create_markers (buoy_data, selection, map) {
       /* if wave data selected  //TODO make wind one */
       let myIcon, popUp
       if (selection === 0) {
-        console.log('MAKEING WAVE ICON')
+        // console.log('MAKEING WAVE ICON')
         myIcon = return_Wave_Icon(currentData)
         popUp = return_wave_popUp(latest_data)
       } else if (selection === 1) {
-        console.log('MAKEING WIND ICON')
-
+        // console.log('MAKEING WIND ICON')
+        console.log(currentData)
         myIcon = returnWindIcon(currentData)
         popUp = returnWindPopUp(latest_data)
       }
       if (!myIcon) return
       // console.log(currentData);
-      const myMarker = marker([currentData.LAT, currentData.LON], { icon: myIcon }).bindPopup(
-        popUp
-      )
-      mapMarkers = [...mapMarkers, ...[myMarker]]
-      markers.addLayer(
-        myMarker
-      )
+      const myMarker = marker([currentData.LAT, currentData.LON], {
+        icon: myIcon
+      }).bindPopup(popUp)
+      // mapMarkers = [...mapMarkers, ...[myMarker]]
+      markers.addLayer(myMarker)
     })
+    markersRef = markers
     map.addLayer(markers)
   }
 }
@@ -94,25 +95,30 @@ function returnWindPopUp (latest_data) {
   return popUp
 }
 function returnWindIcon (currentData) {
-  // console.log(currentData)
   if (
-    isNaN(currentData.GST) &&
     isNaN(currentData.WSPD) &&
-    (isNaN(currentData.WDIR))
-  ) { return null }
+    isNaN(currentData.WDIR)
+  ) {
+    return null
+  }
   const color_spd = colorWspd(currentData.WSPD)
-  const size_gust = sizeGust(currentData.WSPD, currentData.GST)
-  const dirrection = parseDegrees(currentData.WDIR)
+  const color_gst = colorWspd(
+    currentData.GST !== '-' ? currentData.GST : currentData.WSPD
+  )
+  const size_gust = sizeGust(currentData.WSPD)
+  const direction = parseDirection(parseDegrees(currentData.WDIR))
   var myIcon = L.divIcon({
+    className: '',
+
     html: ReactDOMServer.renderToString(
       <WindIcon
-        WDIR={dirrection}
-        color={color_spd}
+        color_gst={color_gst}
+        direction={direction}
+        color_spd={color_spd}
         size={size_gust}
         speed={currentData.WSPD}
       />
     ),
-    // iconSize: [30, 42],
     iconAnchor: [0, 0]
   })
   return myIcon
@@ -130,21 +136,22 @@ function return_Wave_Icon (currentData) {
     isNaN(currentData.SwP) &&
     isNaN(currentData.SwH) &&
     (isNaN(currentData.APD) && isNaN(currentData.WVHT))
-  ) { return null }
-  const color_ft = colorFt(currentData.SwH !== '-' ? currentData.SwH : currentData.WVHT)
-  const size_period = sizePeriod(currentData.SwP !== '-' ? currentData.SwP : currentData.APD)
-  const dirrection =
+  ) {
+    return null
+  }
+  const color_ft = colorFt(
+    currentData.SwH !== '-' ? currentData.SwH : currentData.WVHT
+  )
+  const size_period = sizePeriod(
+    currentData.SwP !== '-' ? currentData.SwP : currentData.APD
+  )
+  const direction =
     currentData.SwD !== '-' ? currentData.SwD : parseDegrees(currentData.WDIR)
   var myIcon = L.divIcon({
-    className: 'swell_marker',
+    className: '',
     html: ReactDOMServer.renderToString(
-      <WaveIcon
-        SwD={dirrection}
-        color_ft={color_ft}
-        size_period={size_period}
-      />
+      <WaveIcon SwD={direction} color_ft={color_ft} size_period={size_period} />
     ),
-    // iconSize: [30, 42],
     iconAnchor: [0, 0]
   })
   return myIcon
@@ -170,25 +177,36 @@ function colorWspd (spd) {
   console.log({ color })
   return color
 }
-function sizeGust (spd, gust) {
-  const diff = gust - spd
-  let size = 20
-  size = size + diff
+function sizeGust (spd) {
+  let size = 25
+  size = size + spd
   return size
 }
-function parseDegrees (degrees) {
-  let dirrection
-  if (degrees > 0 && degrees < 46) dirrection = 'SW'
-  else if (degrees > 45 && degrees < 91) dirrection = 'W'
-  else if (degrees > 90 && degrees < 136) dirrection = 'NW'
-  else if (degrees > 135 && degrees < 181) dirrection = 'N'
-  else if (degrees > 180 && degrees < 226) dirrection = 'NE'
-  else if (degrees > 225 && degrees < 271) dirrection = 'E'
-  else if (degrees > 270 && degrees < 316) dirrection = 'SE'
-  else if (degrees > 315) dirrection = 'S'
-  else dirrection = 'N'
 
-  return dirrection
+function parseDirection (compassDirr) {
+  const c = compassDirr
+  if (c === 'W') return 'left'
+  else if (c === 'SW') return 'up-left'
+  else if (c === 'S') return 'up'
+  else if (c === 'SE') return 'up-right'
+  else if (c === 'E') return 'right'
+  else if (c === 'NE') return 'down-left'
+  else if (c === 'N') return 'down'
+  else if (c === 'NW') return 'down-right'
+}
+function parseDegrees (degrees) {
+  let direction
+  if (degrees > 0 && degrees < 46) direction = 'SW'
+  else if (degrees > 45 && degrees < 91) direction = 'W'
+  else if (degrees > 90 && degrees < 136) direction = 'NW'
+  else if (degrees > 135 && degrees < 181) direction = 'N'
+  else if (degrees > 180 && degrees < 226) direction = 'NE'
+  else if (degrees > 225 && degrees < 271) direction = 'E'
+  else if (degrees > 270 && degrees < 316) direction = 'SE'
+  else if (degrees > 315) direction = 'S'
+  else direction = 'N'
+  // console.log({ direction, degrees })
+  return direction
 }
 /* could be exported elsewhere */
 function sizePeriod (sec) {
@@ -231,9 +249,9 @@ function WindDataPopup ({ latest_data }) {
       <p>{convert_GMT_hours(latest_data[0].TIME).date_string}</p>
       {latest_data.map((data, key) => (
         <p key={key}>
-          {`${convert_GMT_hours(data.TIME).time_string} ${data.WSPD} kts. Gust @ ${
-             data.GST
-          } | ${parseDegrees(data.WDIR)}`}
+          {`${convert_GMT_hours(data.TIME).time_string} ${
+            data.WSPD
+          } kts. Gust @ ${data.GST} | ${parseDegrees(data.WDIR)}`}
         </p>
       ))}
     </>
@@ -263,9 +281,11 @@ function WaveDataPopup ({ latest_data }) {
       <p>{convert_GMT_hours(latest_data[0].TIME).date_string}</p>
       {latest_data.map((data, key) => (
         <p key={key}>
-          {`${convert_GMT_hours(data.TIME).time_string} ${data.SwH !== '-' ? data.SwH : data.WVHT} ft. @ ${
-            data.SwP !== '-' ? data.SwP : data.APD
-          } sec. ${data.SwD !== '-' ? data.SwD : parseDegrees(data.WDIR)}`}
+          {`${convert_GMT_hours(data.TIME).time_string} ${
+            data.SwH !== '-' ? data.SwH : data.WVHT
+          } ft. @ ${data.SwP !== '-' ? data.SwP : data.APD} sec. ${
+            data.SwD !== '-' ? data.SwD : parseDegrees(data.WDIR)
+          }`}
         </p>
       ))}
     </>

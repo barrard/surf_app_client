@@ -7,7 +7,7 @@ import Container from '@material-ui/core/Container'
 // import  MyMap from "../components/Maps/RGM_API.js";
 import LeafMap from '../src/components/Maps/Leaflet_Map.js'
 // import lStyles from 'leaflet/dist/leaflet.css'
-import { colors_legend } from '../src/components/colors/colors'
+import { ColorsLegend } from '../src/components/colors/colors'
 import BottomNavContext from '../src/Context/BottomNavContext.js'
 import PropTypes from 'prop-types'
 
@@ -66,16 +66,19 @@ const Home = () => {
           console.log(props)
           const { bottomNavSetting } = props
           return (
-            <LeafMap
-              bottomNavSetting={bottomNavSetting}
-              latLng={userLocation}
-              buoy_data={bouyMarkers}
-              handleClick={map_click}
-            />
+            <>
+              <LeafMap
+                bottomNavSetting={bottomNavSetting}
+                latLng={userLocation}
+                buoy_data={bouyMarkers}
+                handleClick={map_click}
+              />
+              <Container><ColorsLegend bottomNavSetting={bottomNavSetting} /></Container>
+
+            </>
           )
         }}
       </BottomNavContext.Consumer>
-      <Container>{colors_legend()}</Container>
     </div>
   )
 }

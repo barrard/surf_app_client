@@ -25,37 +25,45 @@ export const colors = [
   'pink'
 ]
 
-export function colors_legend () {
+export function ColorsLegend ({ bottomNavSetting }) {
   const [min, setMin] = useState(false)
   const minimize = () => setMin(!min)
   return (
     <div>
-      <ColorsList handleMinimize={minimize} min={min} />
+      <ColorsList handleMinimize={minimize} min={min} bottomNavSetting={bottomNavSetting} />
     </div>
   )
 }
 
-export function ColorsList ({ handleMinimize, min }) {
+ColorsLegend.propTypes = {
+  bottomNavSetting: PropTypes.number.isRequired
+}
+
+export function ColorsList ({ handleMinimize, min, bottomNavSetting }) {
   return (
     <Container style={{ display: 'flex', position: 'relative' }}>
       <MinimizeBtn handleMinimize={handleMinimize} min={min} />
       <Grid container>
-        {colors.map((color, ft) => (
-          <ColorItem key={ft} color={color} ft={ft} min={min} />
+        {bottomNavSetting === 0 && colors.map((color, count) => (
+          <ColorItem dataType='ft' key={count} color={color} count={count} min={min} />
+        ))}
+        {bottomNavSetting === 1 && colors.map((color, count) => (
+          <ColorItem dataType='kts' key={count} color={color} count={count} min={min} />
         ))}
       </Grid>
     </Container>
   )
 }
 ColorsList.propTypes = {
+  bottomNavSetting: PropTypes.number.isRequired,
   handleMinimize: PropTypes.func.isRequired,
   min: PropTypes.bool.isRequired
 }
-export function ColorItem ({ color, ft, min }) {
+export function ColorItem ({ color, count, min, dataType }) {
   return (
     <Grid
       item
-      key={ft}
+      key={count}
       style={{
         display: 'flex',
         flex: 1,
@@ -66,13 +74,18 @@ export function ColorItem ({ color, ft, min }) {
         background: color
       }}
     >
-      {<p style={{ fontSize: '9px' }}>{`${min ? ' ' : '<' + (ft + 1) + 'ft'}`}</p>}
+      {<p style={{ fontSize: '9px' }}>{`${min ? ' ' : '< ' + (dataTypeUnits(dataType, count)) + dataType}`}</p>}
     </Grid>
   )
 }
+function dataTypeUnits (dType, count) {
+  if (dType === 'ft') return 1 + count
+  else if (dType === 'kts') return (2 * count) + 2
+}
 ColorItem.propTypes = {
+  dataType: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
-  ft: PropTypes.number.isRequired,
+  count: PropTypes.number.isRequired,
   min: PropTypes.bool.isRequired
 }
 function MinimizeBtn ({ handleMinimize, min }) {
