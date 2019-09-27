@@ -2,6 +2,8 @@ import React from 'react'
 import { WaveIcon, WindIcon } from './MapIcons.js'
 import ReactDOMServer from 'react-dom/server'
 import PropTypes from 'prop-types'
+import Container from '@material-ui/core/Container'
+import Grid from '@material-ui/core/Grid'
 
 import L, { Map, tileLayer, marker } from 'leaflet'
 /* eslint-disable */
@@ -82,7 +84,14 @@ export function create_markers (buoy_data, selection, map) {
       // console.log(currentData);
       const myMarker = marker([currentData.LAT, currentData.LON], {
         icon: myIcon
-      }).bindPopup(popUp)
+      }).bindPopup(popUp, { maxWidth: 300, minWidth: 300, maxHeight: 200, className: 'leaflet-popup' })
+        .on('popupopen', function (popup) {
+          setTimeout(() => {
+            const windChart = document.getElementById('windChartContainer')
+            console.log()
+            if (windChart) make_wind_chart('windChartContainer', latest_data)
+          }, 200)
+        })
       // mapMarkers = [...mapMarkers, ...[myMarker]]
       markers.addLayer(myMarker)
     })
@@ -93,7 +102,10 @@ export function create_markers (buoy_data, selection, map) {
 
 function returnWindPopUp (latest_data) {
   const popUp = ReactDOMServer.renderToString(
-    <WindDataPopup latest_data={latest_data} />
+    <>
+      <div id='windChartContainer' />
+      <WindDataPopup latest_data={latest_data} />
+    </>
   )
   return popUp
 }
@@ -188,27 +200,26 @@ function sizeGust (spd) {
 
 function parseDirection (compassDirr) {
   const c = compassDirr
-  if (c === 'W') return 'left'
-  else if (c === 'SW') return 'up-left'
+  if (c === 'W') return 'right'
+  else if (c === 'SW') return 'up-right'
   else if (c === 'S') return 'up'
-  else if (c === 'SE') return 'up-right'
-  else if (c === 'E') return 'right'
+  else if (c === 'SE') return 'up-left'
+  else if (c === 'E') return 'left'
   else if (c === 'NE') return 'down-left'
   else if (c === 'N') return 'down'
   else if (c === 'NW') return 'down-right'
 }
 function parseDegrees (degrees) {
   let direction
-  if (degrees > 0 && degrees < 46) direction = 'SW'
-  else if (degrees > 45 && degrees < 91) direction = 'W'
-  else if (degrees > 90 && degrees < 136) direction = 'NW'
-  else if (degrees > 135 && degrees < 181) direction = 'N'
-  else if (degrees > 180 && degrees < 226) direction = 'NE'
-  else if (degrees > 225 && degrees < 271) direction = 'E'
-  else if (degrees > 270 && degrees < 316) direction = 'SE'
-  else if (degrees > 315) direction = 'S'
-  else direction = 'N'
-  // console.log({ direction, degrees })
+  if (degrees > 337 || degrees < 23) direction = 'N'
+  else if (degrees > 22 && degrees < 68) direction = 'NE'
+  else if (degrees > 67 && degrees < 113) direction = 'E'
+  else if (degrees > 112 && degrees < 158) direction = 'SE'
+  else if (degrees > 157 && degrees < 203) direction = 'S'
+  else if (degrees > 202 && degrees < 248) direction = 'SW'
+  else if (degrees > 247 && degrees < 293) direction = 'W'
+  else if (degrees > 292 && degrees < 338) direction = 'NW'
+  console.log({ direction, degrees })
   return direction
 }
 /* could be exported elsewhere */
@@ -237,12 +248,12 @@ function colorFt (height) {
 }
 
 function WindDataPopup ({ latest_data }) {
+  console.log({ latest_data })
   /* time stamp data */
   return (
-    <>
-      <StationIdLink id={latest_data[0].ID} />
+    <div>
+      <StationIdLink latest_data={latest_data} />
 
-      <p>{convert_GMT_hours(latest_data[0].TIME).date_string}</p>
       {latest_data.map((data, key) => (
         <p key={key}>
           {`${convert_GMT_hours(data.TIME).time_string} ${
@@ -250,7 +261,7 @@ function WindDataPopup ({ latest_data }) {
           } kts. Gust @ ${data.GST} | ${parseDegrees(data.WDIR)}`}
         </p>
       ))}
-    </>
+    </div>
   )
 }
 WindDataPopup.propTypes = {
@@ -263,11 +274,11 @@ WindDataPopup.propTypes = {
 }
 function WaveDataPopup ({ latest_data }) {
   /* time stamp data */
+  if (latest_data[0].ID === 51213) { console.log({ latest_data }) }
   return (
     <>
-      <StationIdLink id={latest_data[0].ID} />
+      <StationIdLink latest_data={latest_data} />
 
-      <p>{convert_GMT_hours(latest_data[0].TIME).date_string}</p>
       {latest_data.map((data, key) => (
         <p key={key}>
           {`${convert_GMT_hours(data.TIME).time_string} ${
@@ -299,6 +310,7 @@ export function add_circle ([lat, lng], map) {
 }
 
 function convert_GMT_hours (GMT_hour_timestamp) {
+  console.log({ GMT_hour_timestamp })
   // 0700 should return 900PM hawaii
   /* if time is 530, we need it to be 0530 */
   GMT_hour_timestamp = process_GMT_timestamp(GMT_hour_timestamp)
@@ -313,35 +325,147 @@ function convert_GMT_hours (GMT_hour_timestamp) {
 
   const date_string = new Date(tmp_date).toDateString()
   const time_string = new Date(tmp_date).toLocaleTimeString()
+  console.log({ date_string, time_string })
   return { date_string, time_string }
 }
 
 function process_GMT_timestamp (time) {
   time = String(time)
-  if (time.length === 3) {
+  if (time.length < 4) {
     time = time.split('')
     time.unshift('0')
     time = time.join('')
   }
-
-  return time
+  if (time.length < 4) {
+    return process_GMT_timestamp(time)
+  } else {
+    return time
+  }
 }
-function StationIdLink ({ id }) {
+function StationIdLink ({ latest_data }) {
+  const id = latest_data[0].ID
   return (
-    <p>
-          Station ID:
-      <a
-        target='_blank' rel='noopener noreferrer'
-        href={`https://www.ndbc.noaa.gov/station_page.php?station=${id}`}
-      >
-        {id}
-      </a>
-    </p>
+    <Container>
+      <Grid container space={0}>
+        <Grid item xs={6}>
+          <p>
+          Station ID:{' '}
+            <a
+              target='_blank' rel='noopener noreferrer'
+              href={`https://www.ndbc.noaa.gov/station_page.php?station=${id}`}
+            >
+              {id}
+            </a>
+
+          </p>
+
+        </Grid>
+        <Grid item xs={6}>
+
+          <p>{new Date().toDateString()}</p>
+        </Grid>
+      </Grid>
+
+    </Container>
+
   )
 }
 StationIdLink.propTypes = {
-  id: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number
-  ])
+  latest_data: PropTypes.object
+}
+
+function make_wind_chart (divId, data) {
+  /* take in the data and adjust the TIME */
+  console.log(data)
+
+  data = makeWindData(data)
+  console.log(data)
+  const svg = dimple.newSvg(`#${divId}`, 275, 150)
+  // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
+  const myChart = new dimple.chart(svg, data)
+  myChart.setBounds(60, 30, 275, 150)
+  // setMargins(left, top, right, bottom)
+  myChart.setMargins(45, 30, 0, 40)
+
+  const x = myChart.addTimeAxis('x', 'time')
+  // x.dateParseFormat = '%H:%M:%S'
+  // x.ticks = 4
+  x.timePeriod = d3.timeMinute
+  x.timeInterval = 20
+
+  x.tickFormat = '%I:%M'
+  // x.addOrderRule('time')
+  const y1 = myChart.addMeasureAxis('y', 'kts')
+  // const y2 = myChart.addMeasureAxis('y', 'Gust')
+  y1.ticks = 4
+  // myChart.addColorAxis('Wind Speed', ['blue', 'yellow'])
+  // Min price will be green, middle price yellow and max red
+  // myChart.addColorAxis('GST', ['green', 'red'])
+  const prop_min = getMin(data, 'kts')
+  const prop_max = getMax(data, 'kts')
+  y1.overrideMax = prop_max + (prop_max * 0.1)
+  y1.overrideMin = prop_min - (prop_min * 0.1)
+
+  myChart.assignColor('Wind Speed', 'green')
+  const s1 = myChart.addSeries('type', dimple.plot.line)
+  // const s2 = myChart.addSeries(null, dimple.plot.line, [x, y2])
+  s1.lineMarkers = true
+
+  s1.interpolation = 'cardinal'
+  // s2.lineMarkers = true
+
+  // s2.interpolation = 'cardinal'
+  myChart.addLegend(100, 0, 50, 200, 'right')
+
+  myChart.draw()
+}
+function getMin (data, prop) {
+  return parseFloat(data.reduce((min, p) => p[prop] < min ? p[prop] : min, data[0][prop]))
+}
+function getMax (data, prop) {
+  return parseFloat(data.reduce((max, p) => p[prop] > max ? p[prop] : max, data[0][prop]))
+}
+function makeWindData (data) {
+  const new_data = []
+  data.forEach(d => {
+    const gust = {
+      type: 'Gust',
+      time: adjustTime(d.TIME),
+      kts: d.GST
+    }
+    const wspd = {
+      type: 'Wind Speed',
+      time: adjustTime(d.TIME),
+      kts: d.WSPD
+    }
+    new_data.push(gust)
+    new_data.push(wspd)
+  })
+  return new_data
+}
+function fixTimeAndRelabel (data, alterLables) {
+  data = data.map(d => {
+    const relabled_data = {}
+    for (const newLabel in alterLables) {
+      relabled_data[newLabel] = d[alterLables[newLabel]]
+    }
+    return ({ ...d, TIME: adjustTime(d.TIME), ...relabled_data })
+  })
+  return (data)
+}
+
+function adjustTime (time) {
+// 130
+
+  time = process_GMT_timestamp(time)
+  // 0130
+  const offset = new Date().getTimezoneOffset() / 60
+  let hour = time.slice(0, 2)
+  const minute = time.slice(2, 4)
+
+  hour = hour - offset
+  if (hour < 0)hour = hour + 24
+  console.log(`${hour}:${minute}`)
+  time = new Date().setHours(hour, minute)
+  return new Date(time).getTime()
 }

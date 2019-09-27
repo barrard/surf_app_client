@@ -31,7 +31,8 @@ class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
-          {/* <script src='/static/js/leaflet.geometryutil.js' /> */}
+          <script src='/static/js/d3.js' />
+          <script src='/static/js/dimple.js' />
         </body>
       </html>
     )
