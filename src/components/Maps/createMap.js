@@ -90,6 +90,9 @@ export function create_markers (buoy_data, selection, map) {
             const windChart = document.getElementById('windChartContainer')
             console.log()
             if (windChart) make_wind_chart('windChartContainer', latest_data)
+            const waveChart = document.getElementById('waveChartContainer')
+            console.log()
+            if (waveChart) make_wave_chart('waveChartContainer', latest_data)
           }, 200)
         })
       // mapMarkers = [...mapMarkers, ...[myMarker]]
@@ -141,7 +144,11 @@ function returnWindIcon (currentData) {
 
 function return_wave_popUp (latest_data) {
   const popUp = ReactDOMServer.renderToString(
-    <WaveDataPopup latest_data={latest_data} />
+    <>
+      <div id='waveChartContainer' />
+
+      <WaveDataPopup latest_data={latest_data} />
+    </>
   )
   return popUp
 }
@@ -219,7 +226,7 @@ function parseDegrees (degrees) {
   else if (degrees > 202 && degrees < 248) direction = 'SW'
   else if (degrees > 247 && degrees < 293) direction = 'W'
   else if (degrees > 292 && degrees < 338) direction = 'NW'
-  console.log({ direction, degrees })
+  // console.log({ direction, degrees })
   return direction
 }
 /* could be exported elsewhere */
@@ -310,7 +317,7 @@ export function add_circle ([lat, lng], map) {
 }
 
 function convert_GMT_hours (GMT_hour_timestamp) {
-  console.log({ GMT_hour_timestamp })
+  // console.log({ GMT_hour_timestamp })
   // 0700 should return 900PM hawaii
   /* if time is 530, we need it to be 0530 */
   GMT_hour_timestamp = process_GMT_timestamp(GMT_hour_timestamp)
@@ -325,7 +332,7 @@ function convert_GMT_hours (GMT_hour_timestamp) {
 
   const date_string = new Date(tmp_date).toDateString()
   const time_string = new Date(tmp_date).toLocaleTimeString()
-  console.log({ date_string, time_string })
+  // console.log({ date_string, time_string })
   return { date_string, time_string }
 }
 
@@ -374,6 +381,65 @@ StationIdLink.propTypes = {
   latest_data: PropTypes.object
 }
 
+function make_wave_chart (divId, data) {
+  /* take in the data and adjust the TIME */
+  console.log(data)
+
+  data = makeWaveData(data)
+  console.log(data)
+  const svg = dimple.newSvg(`#${divId}`, 275, 150)
+  // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
+  const myChart = new dimple.chart(svg)
+  const periodData = data.filter(d => d.Seconds !== undefined)
+  const heightData = data.filter(d => d.Ft !== undefined)
+
+  myChart.setBounds(60, 30, 275, 150)
+  // setMargins(left, top, right, bottom)
+  myChart.setMargins(45, 30, 50, 40)
+
+  const x = myChart.addTimeAxis('x', 'time')
+  // x.dateParseFormat = '%H:%M:%S'
+  // x.ticks = 4
+  x.timePeriod = d3.timeMinute
+  x.timeInterval = 20
+
+  x.tickFormat = '%I:%M'
+  // x.addOrderRule('time')
+  const y1 = myChart.addMeasureAxis('y', 'Seconds')
+  const y2 = myChart.addMeasureAxis('y', 'Ft')
+  y1.ticks = 4
+  y2.ticks = 4
+  y1.title = 'Sec.'
+  y2.title = 'Ft.'
+  // myChart.addColorAxis('Wind Speed', ['blue', 'yellow'])
+  // Min price will be green, middle price yellow and max red
+  // myChart.addColorAxis('GST', ['green', 'red'])
+  const sec_min = getMin(data, 'Seconds')
+  const sec_max = getMax(data, 'Seconds')
+  const ft_min = getMin(data, 'Ft')
+  const ft_max = getMax(data, 'Ft')
+  console.log({ sec_max, sec_min, ft_max, ft_min })
+  y1.overrideMax = sec_max + (sec_max * 0.1)
+  y1.overrideMin = sec_min - (sec_min * 0.1)
+  y2.overrideMax = ft_max + (ft_max * 0.1)
+  y2.overrideMin = ft_min - (ft_min * 0.1)
+
+  myChart.assignColor('Ft', 'green')
+  const s1 = myChart.addSeries('type', dimple.plot.line, [x, y1])
+  const s2 = myChart.addSeries('type', dimple.plot.line, [x, y2])
+  s1.data = periodData
+  s2.data = heightData
+  s1.lineMarkers = true
+
+  s1.interpolation = 'cardinal'
+  s2.lineMarkers = true
+
+  s2.interpolation = 'cardinal'
+  myChart.addLegend(100, 0, 50, 200, 'right')
+
+  myChart.draw()
+}
+
 function make_wind_chart (divId, data) {
   /* take in the data and adjust the TIME */
   console.log(data)
@@ -420,10 +486,37 @@ function make_wind_chart (divId, data) {
   myChart.draw()
 }
 function getMin (data, prop) {
-  return parseFloat(data.reduce((min, p) => p[prop] < min ? p[prop] : min, data[0][prop]))
+  console.log({ data, prop })
+  const _data = data.filter(d => d[prop] !== undefined)
+  console.log({ _data, prop })
+  return parseFloat(_data.reduce((min, p) => p[prop] < min ? p[prop] : min, _data[0][prop]))
 }
 function getMax (data, prop) {
-  return parseFloat(data.reduce((max, p) => p[prop] > max ? p[prop] : max, data[0][prop]))
+  const _data = data.filter(d => d[prop] !== undefined)
+  console.log({ _data, prop })
+
+  console.log(_data)
+
+  return parseFloat(_data.reduce((max, p) => p[prop] > max ? p[prop] : max, _data[0][prop]))
+}
+
+function makeWaveData (data) {
+  const new_data = []
+  data.forEach(d => {
+    const period = {
+      type: 'Period',
+      time: adjustTime(d.TIME),
+      Seconds: d.SwP
+    }
+    const height = {
+      type: 'Wave Height',
+      time: adjustTime(d.TIME),
+      Ft: d.SwH
+    }
+    new_data.push(period)
+    new_data.push(height)
+  })
+  return new_data
 }
 function makeWindData (data) {
   const new_data = []
