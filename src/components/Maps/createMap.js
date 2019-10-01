@@ -56,7 +56,7 @@ export default function createMap (handleClick) {
 
 let markersRef = null
 export function create_markers (buoy_data, selection, map) {
-  console.log({ markersRef })
+  // console.log({ markersRef })
   if (markersRef) map.removeLayer(markersRef)
   markersRef = null
   var markers = L.markerClusterGroup({
@@ -76,7 +76,7 @@ export function create_markers (buoy_data, selection, map) {
         popUp = return_wave_popUp(latest_data)
       } else if (selection === 1) {
         // console.log('MAKEING WIND ICON')
-        console.log(currentData)
+        // console.log(currentData)
         myIcon = returnWindIcon(currentData)
         popUp = returnWindPopUp(latest_data)
       }
@@ -84,14 +84,20 @@ export function create_markers (buoy_data, selection, map) {
       // console.log(currentData);
       const myMarker = marker([currentData.LAT, currentData.LON], {
         icon: myIcon
-      }).bindPopup(popUp, { maxWidth: 300, minWidth: 300, maxHeight: 200, className: 'leaflet-popup' })
+      })
+        .bindPopup(popUp, {
+          maxWidth: 300,
+          minWidth: 300,
+          maxHeight: 200,
+          className: 'leaflet-popup'
+        })
         .on('popupopen', function (popup) {
           setTimeout(() => {
             const windChart = document.getElementById('windChartContainer')
-            console.log()
+
             if (windChart) make_wind_chart('windChartContainer', latest_data)
             const waveChart = document.getElementById('waveChartContainer')
-            console.log()
+
             if (waveChart) make_wave_chart('waveChartContainer', latest_data)
           }, 200)
         })
@@ -113,10 +119,7 @@ function returnWindPopUp (latest_data) {
   return popUp
 }
 function returnWindIcon (currentData) {
-  if (
-    isNaN(currentData.WSPD) &&
-    isNaN(currentData.WDIR)
-  ) {
+  if (isNaN(currentData.WSPD) && isNaN(currentData.WDIR)) {
     return null
   }
   const color_spd = colorWspd(currentData.WSPD)
@@ -154,9 +157,9 @@ function return_wave_popUp (latest_data) {
 }
 function return_Wave_Icon (currentData) {
   if (
-    isNaN(currentData.SwP) &&
-    isNaN(currentData.SwH) &&
-    (isNaN(currentData.APD) && isNaN(currentData.WVHT))
+    (isNaN(currentData.SwP) && isNaN(currentData.APD)) ||
+    (isNaN(currentData.SwH) && isNaN(currentData.WVHT)) ||
+    (isNaN(currentData.SwD) && isNaN(currentData.WDIR))
   ) {
     return null
   }
@@ -196,7 +199,7 @@ function colorWspd (spd) {
   else if (spd > 25 && spd < 28) color = colors[12]
   else if (spd > 27 && spd < 30) color = colors[13]
   else if (spd > 29) color = colors[14]
-  console.log({ color })
+  // console.log({ color })
   return color
 }
 function sizeGust (spd) {
@@ -281,7 +284,9 @@ WindDataPopup.propTypes = {
 }
 function WaveDataPopup ({ latest_data }) {
   /* time stamp data */
-  if (latest_data[0].ID === 51213) { console.log({ latest_data }) }
+  if (latest_data[0].ID === 51213) {
+    console.log({ latest_data })
+  }
   return (
     <>
       <StationIdLink latest_data={latest_data} />
@@ -356,25 +361,21 @@ function StationIdLink ({ latest_data }) {
       <Grid container space={0}>
         <Grid item xs={6}>
           <p>
-          Station ID:{' '}
+            Station ID:{' '}
             <a
-              target='_blank' rel='noopener noreferrer'
+              target='_blank'
+              rel='noopener noreferrer'
               href={`https://www.ndbc.noaa.gov/station_page.php?station=${id}`}
             >
               {id}
             </a>
-
           </p>
-
         </Grid>
         <Grid item xs={6}>
-
           <p>{new Date().toDateString()}</p>
         </Grid>
       </Grid>
-
     </Container>
-
   )
 }
 StationIdLink.propTypes = {
@@ -418,11 +419,11 @@ function make_wave_chart (divId, data) {
   const sec_max = getMax(data, 'Seconds')
   const ft_min = getMin(data, 'Ft')
   const ft_max = getMax(data, 'Ft')
-  console.log({ sec_max, sec_min, ft_max, ft_min })
-  y1.overrideMax = sec_max + (sec_max * 0.1)
-  y1.overrideMin = sec_min - (sec_min * 0.1)
-  y2.overrideMax = ft_max + (ft_max * 0.1)
-  y2.overrideMin = ft_min - (ft_min * 0.1)
+  // console.log({ sec_max, sec_min, ft_max, ft_min })
+  y1.overrideMax = sec_max + sec_max * 0.1
+  y1.overrideMin = sec_min - sec_min * 0.1
+  y2.overrideMax = ft_max + ft_max * 0.1
+  y2.overrideMin = ft_min - ft_min * 0.1
 
   myChart.assignColor('Ft', 'green')
   const s1 = myChart.addSeries('type', dimple.plot.line, [x, y1])
@@ -442,10 +443,10 @@ function make_wave_chart (divId, data) {
 
 function make_wind_chart (divId, data) {
   /* take in the data and adjust the TIME */
-  console.log(data)
+  // console.log(data)
 
   data = makeWindData(data)
-  console.log(data)
+  // console.log(data)
   const svg = dimple.newSvg(`#${divId}`, 275, 150)
   // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
   const myChart = new dimple.chart(svg, data)
@@ -469,8 +470,8 @@ function make_wind_chart (divId, data) {
   // myChart.addColorAxis('GST', ['green', 'red'])
   const prop_min = getMin(data, 'kts')
   const prop_max = getMax(data, 'kts')
-  y1.overrideMax = prop_max + (prop_max * 0.1)
-  y1.overrideMin = prop_min - (prop_min * 0.1)
+  y1.overrideMax = prop_max + prop_max * 0.1
+  y1.overrideMin = prop_min - prop_min * 0.1
 
   myChart.assignColor('Wind Speed', 'green')
   const s1 = myChart.addSeries('type', dimple.plot.line)
@@ -486,18 +487,22 @@ function make_wind_chart (divId, data) {
   myChart.draw()
 }
 function getMin (data, prop) {
-  console.log({ data, prop })
+  // console.log({ data, prop })
   const _data = data.filter(d => d[prop] !== undefined)
-  console.log({ _data, prop })
-  return parseFloat(_data.reduce((min, p) => p[prop] < min ? p[prop] : min, _data[0][prop]))
+  // console.log({ _data, prop })
+  return parseFloat(
+    _data.reduce((min, p) => (p[prop] < min ? p[prop] : min), _data[0][prop])
+  )
 }
 function getMax (data, prop) {
   const _data = data.filter(d => d[prop] !== undefined)
-  console.log({ _data, prop })
+  // console.log({ _data, prop })
 
-  console.log(_data)
+  // console.log(_data)
 
-  return parseFloat(_data.reduce((max, p) => p[prop] > max ? p[prop] : max, _data[0][prop]))
+  return parseFloat(
+    _data.reduce((max, p) => (p[prop] > max ? p[prop] : max), _data[0][prop])
+  )
 }
 
 function makeWaveData (data) {
@@ -542,13 +547,13 @@ function fixTimeAndRelabel (data, alterLables) {
     for (const newLabel in alterLables) {
       relabled_data[newLabel] = d[alterLables[newLabel]]
     }
-    return ({ ...d, TIME: adjustTime(d.TIME), ...relabled_data })
+    return { ...d, TIME: adjustTime(d.TIME), ...relabled_data }
   })
-  return (data)
+  return data
 }
 
 function adjustTime (time) {
-// 130
+  // 130
 
   time = process_GMT_timestamp(time)
   // 0130
@@ -557,8 +562,8 @@ function adjustTime (time) {
   const minute = time.slice(2, 4)
 
   hour = hour - offset
-  if (hour < 0)hour = hour + 24
-  console.log(`${hour}:${minute}`)
+  if (hour < 0) hour = hour + 24
+  // console.log(`${hour}:${minute}`)
   time = new Date().setHours(hour, minute)
   return new Date(time).getTime()
 }
