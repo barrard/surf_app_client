@@ -156,22 +156,25 @@ function return_wave_popUp (latest_data) {
   return popUp
 }
 function return_Wave_Icon (currentData) {
+  let period, waveDirection, height
+  if (currentData.SwP !== '-') period = currentData.SwP
+  else if (currentData.APD !== '-') period = currentData.APD
+
+  if (currentData.SwD !== '-') waveDirection = currentData.SwD
+  else if (currentData.WDIR !== '-') waveDirection = currentData.WDIR
+
+  if (currentData.SwH !== '-') height = currentData.SwH
+  else if (currentData.WVHT !== '-') height = parseDegrees(currentData.WDIR)
+
   if (
-    (isNaN(currentData.SwP) && isNaN(currentData.APD)) ||
-    (isNaN(currentData.SwH) && isNaN(currentData.WVHT)) ||
-    (isNaN(currentData.SwD) && isNaN(currentData.WDIR))
+    !period || !waveDirection || !height
   ) {
     return null
   }
   // console.log(currentData)
-  const color_ft = colorFt(
-    currentData.SwH !== '-' ? currentData.SwH : currentData.WVHT
-  )
-  const size_period = sizePeriod(
-    currentData.SwP !== '-' ? currentData.SwP : currentData.APD
-  )
-  const direction =
-    currentData.SwD !== '-' ? currentData.SwD : parseDegrees(currentData.WDIR)
+  const color_ft = colorFt(height)
+  const size_period = sizePeriod(period)
+  const direction = waveDirection
   var myIcon = L.divIcon({
     className: '',
     html: ReactDOMServer.renderToString(
