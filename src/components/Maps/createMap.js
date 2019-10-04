@@ -324,39 +324,6 @@ export function add_circle ([lat, lng], map) {
   }).addTo(map)
 }
 
-function convert_GMT_hours (GMT_hour_timestamp) {
-  // console.log({ GMT_hour_timestamp })
-  // 0700 should return 900PM hawaii
-  /* if time is 530, we need it to be 0530 */
-  GMT_hour_timestamp = process_GMT_timestamp(GMT_hour_timestamp)
-  const hour = GMT_hour_timestamp.slice(0, 2)
-  const minute = GMT_hour_timestamp.slice(2, 4)
-  const offset = new Date().getTimezoneOffset() / 60
-
-  const GMT_date_string = new Date().toGMTString()
-
-  let tmp_date = new Date(GMT_date_string).setHours(hour - offset)
-  tmp_date = new Date(tmp_date).setMinutes(minute)
-
-  const date_string = new Date(tmp_date).toDateString()
-  const time_string = new Date(tmp_date).toLocaleTimeString()
-  // console.log({ date_string, time_string })
-  return { date_string, time_string }
-}
-
-function process_GMT_timestamp (time) {
-  time = String(time)
-  if (time.length < 4) {
-    time = time.split('')
-    time.unshift('0')
-    time = time.join('')
-  }
-  if (time.length < 4) {
-    return process_GMT_timestamp(time)
-  } else {
-    return time
-  }
-}
 function StationIdLink ({ latest_data }) {
   const id = latest_data[0].ID
   return (
@@ -449,9 +416,12 @@ function make_wind_chart (divId, data) {
   // console.log(data)
 
   data = makeWindData(data)
-  // console.log(data)
+  console.log(data)
+  data.forEach(i => {
+    console.log(new Date(i.time))
+  })
   const svg = dimple.newSvg(`#${divId}`, 275, 150)
-  // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
+
   const myChart = new dimple.chart(svg, data)
   myChart.setBounds(60, 30, 275, 150)
   // setMargins(left, top, right, bottom)
@@ -513,12 +483,12 @@ function makeWaveData (data) {
   data.forEach(d => {
     const period = {
       type: 'Period',
-      time: adjustTime(d.TIME),
+      time: convert_GMT_hours(d.TIME).timestamp,
       Seconds: d.SwP
     }
     const height = {
       type: 'Wave Height',
-      time: adjustTime(d.TIME),
+      time: convert_GMT_hours(d.TIME).timestamp,
       Ft: d.SwH
     }
     new_data.push(period)
@@ -531,12 +501,12 @@ function makeWindData (data) {
   data.forEach(d => {
     const gust = {
       type: 'Gust',
-      time: adjustTime(d.TIME),
+      time: convert_GMT_hours(d.TIME).timestamp,
       kts: d.GST
     }
     const wspd = {
       type: 'Wind Speed',
-      time: adjustTime(d.TIME),
+      time: convert_GMT_hours(d.TIME).timestamp,
       kts: d.WSPD
     }
     new_data.push(gust)
@@ -550,23 +520,42 @@ function fixTimeAndRelabel (data, alterLables) {
     for (const newLabel in alterLables) {
       relabled_data[newLabel] = d[alterLables[newLabel]]
     }
-    return { ...d, TIME: adjustTime(d.TIME), ...relabled_data }
+    return { ...d, TIME: convert_GMT_hours(d.TIME).timestamp, ...relabled_data }
   })
   return data
 }
 
-function adjustTime (time) {
-  // 130
-
-  time = process_GMT_timestamp(time)
-  // 0130
+function convert_GMT_hours (GMT_hour_timestamp) {
+  // console.log({ GMT_hour_timestamp })
+  // 0700 should return 900PM hawaii
+  /* if time is 530, we need it to be 0530 */
+  GMT_hour_timestamp = process_GMT_timestamp(GMT_hour_timestamp)
+  const hour = GMT_hour_timestamp.slice(0, 2)
+  const minute = GMT_hour_timestamp.slice(2, 4)
   const offset = new Date().getTimezoneOffset() / 60
-  let hour = time.slice(0, 2)
-  const minute = time.slice(2, 4)
 
-  hour = hour - offset
-  if (hour < 0) hour = hour + 24
-  // console.log(`${hour}:${minute}`)
-  time = new Date().setHours(hour, minute)
-  return new Date(time).getTime()
+  const GMT_date_string = new Date().toGMTString()
+  console.log({ GMT_date_string })
+
+  let timestamp = new Date(GMT_date_string).setHours(hour - offset)
+  timestamp = new Date(timestamp).setMinutes(minute)
+  console.log(new Date(timestamp))
+  const date_string = new Date(timestamp).toDateString()
+  const time_string = new Date(timestamp).toLocaleTimeString()
+  // console.log({ date_string, time_string })
+  return { date_string, time_string, timestamp }
+}
+
+function process_GMT_timestamp (time) {
+  time = String(time)
+  if (time.length < 4) {
+    time = time.split('')
+    time.unshift('0')
+    time = time.join('')
+  }
+  if (time.length < 4) {
+    return process_GMT_timestamp(time)
+  } else {
+    return time
+  }
 }
