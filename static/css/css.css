@@ -1,5 +1,5 @@
-.map{
-  height: 400px;
+#map{
+  height: 90vh;
 }
 
 .leaflet-popup{

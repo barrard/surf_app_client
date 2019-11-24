@@ -1,9 +1,9 @@
-import React from 'react'
-import App from 'next/app'
-import CssBaseline from '@material-ui/core/CssBaseline'
-import AppBar from '../src/components/AppBar/AppBar.js'
-import BottomNavigation from '../src/components/BottomNav/BottomNav.js'
-import BottomNavContext from '../src/Context/BottomNavContext.js'
+import React from 'react';
+import App from 'next/app';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import AppBar from '../src/components/AppBar/AppBar.js';
+import BottomNavigation from '../src/components/BottomNav/BottomNav.js';
+import BottomNavContext from '../src/Context/BottomNavContext.js';
 export default class MyApp extends App {
   constructor (props) {
     super(props)
@@ -23,7 +23,10 @@ export default class MyApp extends App {
 
     return (
       <BottomNavContext.Provider
-        value={{ bottomNavSetting: this.state.bottomNavSetting, setBottomNavSetting: this.setBottomNavSetting }}
+        value={{
+          bottomNavSetting: this.state.bottomNavSetting,
+          setBottomNavSetting: this.setBottomNavSetting
+        }}
       >
         <>
           <AppBar />

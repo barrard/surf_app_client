@@ -69,7 +69,7 @@ export function GridKey () {
 }
 
 export function Contain ({ children }) {
-  console.log(children)
+  // console.log(children)
   const classes = useStyles()
   const [fixed, setFixed] = useState(true)
   const [maxWidth, setMaxWidth] = useState('xl')
@@ -79,7 +79,7 @@ export function Contain ({ children }) {
   const remove = () => {
     containerRef.current.remove()
   }
-  console.log(childItems, setChildItems)
+  // console.log(childItems, setChildItems)
 
   return (
     <Container
@@ -103,7 +103,7 @@ export function Contain ({ children }) {
   )
 }
 Contain.propTypes = {
-  children: PropTypes.obj.isRequired
+  children: PropTypes.object.isRequired
 }
 
 export function GridItem ({ children }) {
@@ -164,7 +164,7 @@ export function GridItem ({ children }) {
   )
 }
 GridItem.propTypes = {
-  children: PropTypes.obj.isRequired
+  children: PropTypes.object.isRequired
 }
 
 function GridItemControls ({
@@ -420,7 +420,7 @@ MaxWidthSelect.propTypes = {
 }
 
 export function useChildItems (children) {
-  console.log(children)
+  // console.log(children)
 
   const [childItems, setChildItems] = useState([])
   useEffect(() => {

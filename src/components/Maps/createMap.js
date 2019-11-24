@@ -13,7 +13,7 @@ import markerClusterGroup from "leaflet.markercluster";
 
 import { colors } from '../colors/colors'
 let map
-const clickRaduis = 250
+const clickRaduis = 350
 const metersPerNm = 1610
 export default function createMap (handleClick) {
   map = new Map('map').setView([0, 0], 1)
@@ -261,7 +261,7 @@ function colorFt (height) {
 }
 
 function WindDataPopup ({ latest_data }) {
-  console.log({ latest_data })
+  // console.log({ latest_data })
   /* time stamp data */
   return (
     <div>
@@ -287,9 +287,6 @@ WindDataPopup.propTypes = {
 }
 function WaveDataPopup ({ latest_data }) {
   /* time stamp data */
-  if (latest_data[0].ID === 51213) {
-    console.log({ latest_data })
-  }
   return (
     <>
       <StationIdLink latest_data={latest_data} />
@@ -354,10 +351,10 @@ StationIdLink.propTypes = {
 
 function make_wave_chart (divId, data) {
   /* take in the data and adjust the TIME */
-  console.log(data)
+  // console.log(data)
 
   data = makeWaveData(data)
-  console.log(data)
+  // console.log(data)
   const svg = dimple.newSvg(`#${divId}`, 275, 150)
   // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
   const myChart = new dimple.chart(svg)
@@ -416,10 +413,10 @@ function make_wind_chart (divId, data) {
   // console.log(data)
 
   data = makeWindData(data)
-  console.log(data)
-  data.forEach(i => {
-    console.log(new Date(i.time))
-  })
+  // console.log(data)
+  // data.forEach(i => {
+  //   console.log(new Date(i.time))
+  // })
   const svg = dimple.newSvg(`#${divId}`, 275, 150)
 
   const myChart = new dimple.chart(svg, data)
@@ -481,14 +478,16 @@ function getMax (data, prop) {
 function makeWaveData (data) {
   const new_data = []
   data.forEach(d => {
+    const time = convert_GMT_hours(d.TIME).timestamp
+    console.log(d)
     const period = {
       type: 'Period',
-      time: convert_GMT_hours(d.TIME).timestamp,
+      time: time,
       Seconds: d.SwP
     }
     const height = {
       type: 'Wave Height',
-      time: convert_GMT_hours(d.TIME).timestamp,
+      time: time,
       Ft: d.SwH
     }
     new_data.push(period)
@@ -496,17 +495,19 @@ function makeWaveData (data) {
   })
   return new_data
 }
+
 function makeWindData (data) {
   const new_data = []
   data.forEach(d => {
+    const time = convert_GMT_hours(d.TIME).timestamp
     const gust = {
       type: 'Gust',
-      time: convert_GMT_hours(d.TIME).timestamp,
+      time: time,
       kts: d.GST
     }
     const wspd = {
       type: 'Wind Speed',
-      time: convert_GMT_hours(d.TIME).timestamp,
+      time: time,
       kts: d.WSPD
     }
     new_data.push(gust)
@@ -514,32 +515,23 @@ function makeWindData (data) {
   })
   return new_data
 }
-function fixTimeAndRelabel (data, alterLables) {
-  data = data.map(d => {
-    const relabled_data = {}
-    for (const newLabel in alterLables) {
-      relabled_data[newLabel] = d[alterLables[newLabel]]
-    }
-    return { ...d, TIME: convert_GMT_hours(d.TIME).timestamp, ...relabled_data }
-  })
-  return data
-}
 
 function convert_GMT_hours (GMT_hour_timestamp) {
   // console.log({ GMT_hour_timestamp })
   // 0700 should return 900PM hawaii
   /* if time is 530, we need it to be 0530 */
   GMT_hour_timestamp = process_GMT_timestamp(GMT_hour_timestamp)
+  // console.log({ GMT_hour_timestamp })
   const hour = GMT_hour_timestamp.slice(0, 2)
   const minute = GMT_hour_timestamp.slice(2, 4)
   const offset = new Date().getTimezoneOffset() / 60
 
   const GMT_date_string = new Date().toGMTString()
-  console.log({ GMT_date_string })
-
-  let timestamp = new Date(GMT_date_string).setHours(hour - offset)
+  // console.log({ GMT_date_string })
+  const hours = hour - offset < 0 ? (hour - offset) + 24 : (hour - offset)
+  // console.log({ hours })
+  let timestamp = new Date(GMT_date_string).setHours(hours)
   timestamp = new Date(timestamp).setMinutes(minute)
-  console.log(new Date(timestamp))
   const date_string = new Date(timestamp).toDateString()
   const time_string = new Date(timestamp).toLocaleTimeString()
   // console.log({ date_string, time_string })

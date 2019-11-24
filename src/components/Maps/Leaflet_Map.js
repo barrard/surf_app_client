@@ -9,13 +9,15 @@ class LeafletMap extends React.Component {
     super(props)
     this.state = {
       map: null,
-      all_markers: {}
+      all_markers: {},
+      screenOreintation: 'portrait'
     }
   }
 
   componentDidMount () {
     const { handleClick } = this.props
-
+    this.updateWidthAndHeight()
+    window.addEventListener('resize', this.updateWidthAndHeight)
     console.log(this.props)
     const map = getMap(handleClick)
     this.setState({ map })
@@ -31,6 +33,25 @@ class LeafletMap extends React.Component {
       add_buoy_markers(buoy_data, this.props.bottomNavSetting, map)
     }
   }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.updateWidthAndHeight)
+  }
+
+  updateWidthAndHeight = () => {
+    console.log('update height')
+    if (window.innerHeight > window.innerWidth) {
+      this.setState({
+        screenOreintation: 'portrait'
+      })
+      document.getElementById('map').style.height = '71vh'
+    } else {
+      this.setState({
+        screenOreintation: 'landscape'
+      })
+      document.getElementById('map').style.height = '67vh'
+    }
+  };
 
   render () {
     const { map } = this.state
@@ -51,7 +72,7 @@ class LeafletMap extends React.Component {
         id='map'
         style={{
           width: '100%',
-          height: '400px'
+          height: '71vh'
         }}
       />
     )
