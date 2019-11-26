@@ -64,7 +64,7 @@ export function useLocation () {
         lat, lng, 'M'
       )
       console.log({ dist })
-      if (dist < 300) flag = false
+      if (dist < 400) flag = false
     })
     if (flag) {
       locations.push({ lat, lng })

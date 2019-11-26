@@ -23,6 +23,6 @@
         "react"
     ],
     "rules": {
-        "camelcase":0, "eslint(semi)":0
+        "camelcase":0, "eslint(semi)":0, "new-cap":0
     }
 }

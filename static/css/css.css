@@ -1,9 +1,14 @@
-#map{
+#map {
   height: 90vh;
 }
 
-.leaflet-popup{
+.leaflet-popup {
   margin: 0;
   padding: 0;
 }
 
+.dirArrow {
+  stroke: black;
+  fill: yellow;
+  stroke-width: 1.2px;
+}

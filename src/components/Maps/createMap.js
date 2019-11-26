@@ -13,8 +13,10 @@ import markerClusterGroup from "leaflet.markercluster";
 
 import { colors } from '../colors/colors'
 let map
-const clickRaduis = 350
+const clickRaduis = 450
 const metersPerNm = 1610
+const d3 = window.d3
+const dimple = window.dimple
 export default function createMap (handleClick) {
   map = new Map('map').setView([0, 0], 1)
   var Esri_WorldImagery = tileLayer(
@@ -211,6 +213,28 @@ function sizeGust (spd) {
   return size
 }
 
+function cardnalToDegrees (cardnalDir) {
+  console.log(cardnalDir)
+  /* for an arrow pointing left how many degrees do27 we need to rotate */
+  if (cardnalDir === 'N') return 270
+  else if (cardnalDir === 'NNW') return 248
+  else if (cardnalDir === 'NW') return 225
+  else if (cardnalDir === 'WNW') return 202
+  else if (cardnalDir === 'W') return 180
+  else if (cardnalDir === 'WSW') return 157
+  else if (cardnalDir === 'SW') return 135
+  else if (cardnalDir === 'SSW') return 112
+  else if (cardnalDir === 'S') return 90
+  else if (cardnalDir === 'SSE') return 67
+  else if (cardnalDir === 'SE') return 45
+  else if (cardnalDir === 'ESE') return 23
+  else if (cardnalDir === 'E') return 1
+  else if (cardnalDir === 'ENE') return 293
+  else if (cardnalDir === 'NE') return 315
+  else if (cardnalDir === 'NNE') return 338
+  else return 0
+}
+
 function parseDirection (compassDirr) {
   const c = compassDirr
   if (c === 'W') return 'right'
@@ -261,6 +285,7 @@ function colorFt (height) {
 }
 
 function WindDataPopup ({ latest_data }) {
+  console.log('making wind popup')
   // console.log({ latest_data })
   /* time stamp data */
   return (
@@ -286,6 +311,7 @@ WindDataPopup.propTypes = {
   ).isRequired
 }
 function WaveDataPopup ({ latest_data }) {
+  console.log('making wave popup')
   /* time stamp data */
   return (
     <>
@@ -349,36 +375,41 @@ StationIdLink.propTypes = {
   latest_data: PropTypes.object
 }
 
-function make_wave_chart (divId, data) {
+function make_wave_chart (divId, rawData) {
+  console.log('Makinig wave chart')
   /* take in the data and adjust the TIME */
   // console.log(data)
 
-  data = makeWaveData(data)
-  // console.log(data)
-  const svg = dimple.newSvg(`#${divId}`, 275, 150)
-  // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
+  const data = makeWaveData(rawData)
+  console.log(rawData)
+  const w = 275
+  const h = 150
+  const svg = dimple.newSvg(`#${divId}`, w, h) // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
   const myChart = new dimple.chart(svg)
   const periodData = data.filter(d => d.Seconds !== undefined)
   const heightData = data.filter(d => d.Ft !== undefined)
 
-  myChart.setBounds(60, 30, 275, 150)
+  const ml = 40
+  const mt = 10
+  const mr = 50
+  const mb = 25
   // setMargins(left, top, right, bottom)
-  myChart.setMargins(45, 30, 50, 40)
+  myChart.setMargins(ml, mt, mr, mb)
 
   const x = myChart.addTimeAxis('x', 'time')
   // x.dateParseFormat = '%H:%M:%S'
   // x.ticks = 4
-  x.timePeriod = d3.timeMinute
-  x.timeInterval = 20
+  x.timePeriod = d3.timeHour
+  x.timeInterval = 4
 
   x.tickFormat = '%I:%M'
   // x.addOrderRule('time')
-  const y1 = myChart.addMeasureAxis('y', 'Seconds')
-  const y2 = myChart.addMeasureAxis('y', 'Ft')
+  const y2 = myChart.addMeasureAxis('y', 'Seconds')
+  const y1 = myChart.addMeasureAxis('y', 'Ft')
   y1.ticks = 4
   y2.ticks = 4
-  y1.title = 'Sec.'
-  y2.title = 'Ft.'
+  y2.title = 'Sec.'
+  y1.title = 'Ft.'
   // myChart.addColorAxis('Wind Speed', ['blue', 'yellow'])
   // Min price will be green, middle price yellow and max red
   // myChart.addColorAxis('GST', ['green', 'red'])
@@ -387,48 +418,81 @@ function make_wave_chart (divId, data) {
   const ft_min = getMin(data, 'Ft')
   const ft_max = getMax(data, 'Ft')
   // console.log({ sec_max, sec_min, ft_max, ft_min })
-  y1.overrideMax = sec_max + sec_max * 0.1
-  y1.overrideMin = sec_min - sec_min * 0.1
-  y2.overrideMax = ft_max + ft_max * 0.1
-  y2.overrideMin = ft_min - ft_min * 0.1
+  y2.overrideMax = sec_max + sec_max * 0.2
+  y2.overrideMin = sec_min - sec_min * 0.2
+  y1.overrideMax = ft_max + ft_max * 0.2
+  y1.overrideMin = ft_min - ft_min * 0.2
 
   myChart.assignColor('Ft', 'green')
-  const s1 = myChart.addSeries('type', dimple.plot.line, [x, y1])
-  const s2 = myChart.addSeries('type', dimple.plot.line, [x, y2])
+  const s1 = myChart.addSeries('type', dimple.plot.line, [x, y2])
+  const s2 = myChart.addSeries('type', dimple.plot.line, [x, y1])
   s1.data = periodData
   s2.data = heightData
-  s1.lineMarkers = true
+  // s1.lineMarkers = true
 
-  s1.interpolation = 'cardinal'
-  s2.lineMarkers = true
+  // s1.interpolation = 'cardinal'
+  // s2.lineMarkers = true
 
-  s2.interpolation = 'cardinal'
+  // s2.interpolation = 'cardinal'
   myChart.addLegend(100, 0, 50, 200, 'right')
 
   myChart.draw()
+  const swellArrows = d3.select('.dimple-series-group-0').append('g').selectAll('path').data(rawData)
+  console.log({ swellArrows })
+  swellArrows.exit().remove()
+  swellArrows.enter().append('path').merge(swellArrows)
+    .attr('class', 'dirArrow')
+    .attr('transform', waveDir)
+    .attr('d', drawArrow)
+
+  function waveDir (d, i) {
+    const startX = i * ((w - ml - mr) / rawData.length) + ml - 5
+    const deg = cardnalToDegrees(d.SwD)
+    console.log({ deg })
+    return `rotate(${deg}, ${startX + 5}, ${100})`
+  }
+  function drawArrow (d, i) {
+    const startX = i * ((w - ml - mr) / rawData.length) + ml - 5
+    return `M ${startX}, 100
+                l 5, -3.75
+                l 0, 2.5
+                l 7.5, 0
+                l 0, 2.5
+                l -7.5, 0
+                l 0, 2.5 z`
+  }
+  const tooManyTicks = document.querySelectorAll('.dirArrow')
+  const markerCount = 10
+  Array.from(tooManyTicks).map((d, i, a) => i % (Math.floor(a.length / markerCount)) === 0 ? true : d.remove())
 }
 
-function make_wind_chart (divId, data) {
+function make_wind_chart (divId, rawData) {
   /* take in the data and adjust the TIME */
   // console.log(data)
 
-  data = makeWindData(data)
+  const data = makeWindData(rawData)
   // console.log(data)
   // data.forEach(i => {
   //   console.log(new Date(i.time))
   // })
-  const svg = dimple.newSvg(`#${divId}`, 275, 150)
+  const w = 275
+  const h = 150
+  const svg = dimple.newSvg(`#${divId}`, w, h)
 
   const myChart = new dimple.chart(svg, data)
-  myChart.setBounds(60, 30, 275, 150)
+
+  const ml = 40
+  const mt = 10
+  const mr = 0
+  const mb = 25
   // setMargins(left, top, right, bottom)
-  myChart.setMargins(45, 30, 0, 40)
+  myChart.setMargins(ml, mt, mr, mb)
 
   const x = myChart.addTimeAxis('x', 'time')
-  // x.dateParseFormat = '%H:%M:%S'
+  // x.dateParseFormat = '%a %b %d %Y %k:%M:%S'
   // x.ticks = 4
-  x.timePeriod = d3.timeMinute
-  x.timeInterval = 20
+  x.timePeriod = d3.timeHour
+  x.timeInterval = 4
 
   x.tickFormat = '%I:%M'
   // x.addOrderRule('time')
@@ -444,17 +508,50 @@ function make_wind_chart (divId, data) {
   y1.overrideMin = prop_min - prop_min * 0.1
 
   myChart.assignColor('Wind Speed', 'green')
-  const s1 = myChart.addSeries('type', dimple.plot.line)
+  /* const s1 =  */myChart.addSeries('type', dimple.plot.line)
   // const s2 = myChart.addSeries(null, dimple.plot.line, [x, y2])
-  s1.lineMarkers = true
+  // s1.lineMarkers = true
 
-  s1.interpolation = 'cardinal'
+  // s1.interpolation = 'cardinal'
   // s2.lineMarkers = true
 
   // s2.interpolation = 'cardinal'
   myChart.addLegend(100, 0, 50, 200, 'right')
 
   myChart.draw()
+
+  const windDir = (d) => d.WDIR
+  // const direction = parseDirection(parseDegrees(d.WDIR))
+  const windArrows = d3.select('.dimple-series-group-0').append('g').selectAll('path').data(rawData)
+  console.log({ windArrows })
+  windArrows.exit().remove()
+  windArrows.enter().append('path').merge(windArrows)
+    .attr('class', 'dirArrow')
+    .attr('transform', arrowDir)
+    .attr('d', drawArrow)
+
+  function arrowDir (d, i) {
+    if (!d.WDIR) return
+    const startX = i * ((w - ml) / rawData.length) + ml - 5
+    return `rotate(${windDir(d) - 90}, ${startX + 5}, ${100})`
+  }
+
+  function drawArrow (d, i) {
+    const startX = i * ((w - ml) / rawData.length) + ml - 5
+    return `M ${startX}, 100
+              l 5, -3.75
+              l 0, 2.5
+              l 7.5, 0
+              l 0, 2.5
+              l -7.5, 0
+              l 0, 2.5 z`
+  }
+
+  const tooManyTicks = document.querySelectorAll('.dirArrow')
+  const markerCount = 15
+  Array.from(tooManyTicks).map((d, i, a) => i % (Math.floor(a.length / markerCount)) === 0 ? true : d.remove())
+
+  // className={}
 }
 function getMin (data, prop) {
   // console.log({ data, prop })
@@ -476,43 +573,83 @@ function getMax (data, prop) {
 }
 
 function makeWaveData (data) {
+  console.log('making wave data')
   const new_data = []
-  data.forEach(d => {
-    const time = convert_GMT_hours(d.TIME).timestamp
-    console.log(d)
-    const period = {
-      type: 'Period',
-      time: time,
-      Seconds: d.SwP
+  let localTime = convert_GMT_hours(data[0].TIME).timestamp
+
+  data.forEach((d, i, a) => {
+    let timeDiff = 0
+    // console.log(d.TIME)
+    if (i !== 0) {
+      timeDiff = a[i - 1].TIME - d.TIME
+      if (timeDiff < 0) {
+        timeDiff = timeDiff + 2400
+      }
     }
-    const height = {
-      type: 'Wave Height',
-      time: time,
-      Ft: d.SwH
+    // const time = convert_GMT_hours(d.TIME).timestamp
+    localTime = new Date(localTime - (timeDiff * 1000 * 60)).getTime()
+
+    // console.log(d.SwP)
+    // console.log(d.SwH)
+    if (d.SwP && !isNaN(d.SwP)) {
+      const period = {
+        type: 'Period',
+        time: localTime,
+        Seconds: d.SwP
+      }
+      new_data.push(period)
     }
-    new_data.push(period)
-    new_data.push(height)
+    if (d.SwH && !isNaN(d.SwH)) {
+      const height = {
+        type: 'Wave Height',
+        time: localTime,
+        Ft: d.SwH
+      }
+      new_data.push(height)
+    }
   })
+
+  // console.log(new_data)
+
   return new_data
 }
 
 function makeWindData (data) {
-  const new_data = []
-  data.forEach(d => {
-    const time = convert_GMT_hours(d.TIME).timestamp
+  console.log('making wind data')
+  let new_data = []
+  let localTime = convert_GMT_hours(data[0].TIME).timestamp
+
+  data.forEach((d, i, a) => {
+    let timeDiff = 0
+    // console.log(d.TIME)
+    if (i !== 0) {
+      timeDiff = a[i - 1].TIME - d.TIME
+      if (timeDiff < 0) {
+        timeDiff = timeDiff + 2400
+      }
+    }
+    // const time = convert_GMT_hours(d.TIME).timestamp
+    localTime = new Date(localTime - (timeDiff * 1000 * 60)).getTime()
+    // console.log(new Date(localTime))
+    // console.log({ localTime, timeDiff })
     const gust = {
       type: 'Gust',
-      time: time,
-      kts: d.GST
+      time: (localTime),
+      kts: +d.GST
     }
     const wspd = {
       type: 'Wind Speed',
-      time: time,
-      kts: d.WSPD
+      time: (localTime),
+      kts: +d.WSPD
     }
     new_data.push(gust)
     new_data.push(wspd)
   })
+  /* remove all kts = "-" */
+  // console.log(data)
+  // console.log(new_data)
+  new_data = new_data.filter(d => !isNaN(d.kts))
+  // console.log(new_data)
   return new_data
 }
 
@@ -526,14 +663,24 @@ function convert_GMT_hours (GMT_hour_timestamp) {
   const minute = GMT_hour_timestamp.slice(2, 4)
   const offset = new Date().getTimezoneOffset() / 60
 
-  const GMT_date_string = new Date().toGMTString()
   // console.log({ GMT_date_string })
-  const hours = hour - offset < 0 ? (hour - offset) + 24 : (hour - offset)
+  let timestamp
+  let hours = hour - offset
   // console.log({ hours })
-  let timestamp = new Date(GMT_date_string).setHours(hours)
+  if (hours < 0) {
+    hours = (hour - offset) + 24
+    timestamp = new Date().setHours(hours)
+    // const day = 1000 * 60 * 60 * 24
+    // timestamp = new Date(timestamp - day).getTime()
+  } else {
+    timestamp = new Date().setHours(hours)
+  }
   timestamp = new Date(timestamp).setMinutes(minute)
+  timestamp = new Date(timestamp).setSeconds(0)
   const date_string = new Date(timestamp).toDateString()
   const time_string = new Date(timestamp).toLocaleTimeString()
+  // console.log(timestamp)
+  // console.log(new Date(timestamp))
   // console.log({ date_string, time_string })
   return { date_string, time_string, timestamp }
 }
