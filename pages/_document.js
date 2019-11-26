@@ -30,11 +30,9 @@ class MyDocument extends Document {
         </Head>
         <body>
           <Main />
-          <NextScript />
-          <script src='http://192.168.0.93:8080/target/target-script-min.js#anonymous' />
-
           <script src='/static/js/d3.js' />
           <script src='/static/js/dimple.js' />
+          <NextScript />
         </body>
       </html>
     )
