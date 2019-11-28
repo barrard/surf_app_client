@@ -95,3 +95,17 @@ function distance (lat1, lon1, lat2, lon2, unit) {
     return dist
   }
 }
+
+export function parseDegrees (degrees) {
+  let direction
+  if (degrees > 337 || degrees < 23) direction = 'N'
+  else if (degrees > 22 && degrees < 68) direction = 'NE'
+  else if (degrees > 67 && degrees < 113) direction = 'E'
+  else if (degrees > 112 && degrees < 158) direction = 'SE'
+  else if (degrees > 157 && degrees < 203) direction = 'S'
+  else if (degrees > 202 && degrees < 248) direction = 'SW'
+  else if (degrees > 247 && degrees < 293) direction = 'W'
+  else if (degrees > 292 && degrees < 338) direction = 'NW'
+  // console.log({ direction, degrees })
+  return direction
+}

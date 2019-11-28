@@ -12,6 +12,7 @@ import markerClusterGroup from "leaflet.markercluster";
 /* eslint-enable */
 
 import { colors } from '../colors/colors'
+import { parseDegrees } from '../utilFunctions'
 let map
 const clickRaduis = 450
 const metersPerNm = 1610
@@ -121,6 +122,7 @@ function returnWindPopUp (latest_data) {
   return popUp
 }
 function returnWindIcon (currentData) {
+  // console.log({ currentData })
   if (isNaN(currentData.WSPD) && isNaN(currentData.WDIR)) {
     return null
   }
@@ -148,6 +150,7 @@ function returnWindIcon (currentData) {
 }
 
 function return_wave_popUp (latest_data) {
+  // console.log({latest_data})
   const popUp = ReactDOMServer.renderToString(
     <>
       <div id='waveChartContainer' />
@@ -163,10 +166,10 @@ function return_Wave_Icon (currentData) {
   else if (currentData.APD !== '-') period = currentData.APD
 
   if (currentData.SwD !== '-') waveDirection = currentData.SwD
-  else if (currentData.WDIR !== '-') waveDirection = currentData.WDIR
+  else if (currentData.WDIR !== '-') waveDirection = parseDegrees(currentData.WDIR)
 
   if (currentData.SwH !== '-') height = currentData.SwH
-  else if (currentData.WVHT !== '-') height = parseDegrees(currentData.WDIR)
+  else if (currentData.WVHT !== '-') height = (currentData.WVHT)
 
   if (
     !period || !waveDirection || !height
@@ -187,6 +190,7 @@ function return_Wave_Icon (currentData) {
   return myIcon
 }
 function colorWspd (spd) {
+  if (isNaN(spd)) spd = 0
   let color
   if (spd > 0 && spd < 6) color = colors[0]
   else if (spd > 0 && spd < 3) color = colors[0]
@@ -209,12 +213,16 @@ function colorWspd (spd) {
 }
 function sizeGust (spd) {
   let size = 25
-  size = size + spd
-  return size
+  if (isNaN(spd)) {
+    return size
+  } else {
+    size = size + spd
+    return size
+  }
 }
 
 function cardnalToDegrees (cardnalDir) {
-  console.log(cardnalDir)
+  // console.log(cardnalDir)
   /* for an arrow pointing left how many degrees do27 we need to rotate */
   if (cardnalDir === 'N') return 270
   else if (cardnalDir === 'NNW') return 248
@@ -246,19 +254,7 @@ function parseDirection (compassDirr) {
   else if (c === 'N') return 'down'
   else if (c === 'NW') return 'down-right'
 }
-function parseDegrees (degrees) {
-  let direction
-  if (degrees > 337 || degrees < 23) direction = 'N'
-  else if (degrees > 22 && degrees < 68) direction = 'NE'
-  else if (degrees > 67 && degrees < 113) direction = 'E'
-  else if (degrees > 112 && degrees < 158) direction = 'SE'
-  else if (degrees > 157 && degrees < 203) direction = 'S'
-  else if (degrees > 202 && degrees < 248) direction = 'SW'
-  else if (degrees > 247 && degrees < 293) direction = 'W'
-  else if (degrees > 292 && degrees < 338) direction = 'NW'
-  // console.log({ direction, degrees })
-  return direction
-}
+
 /* could be exported elsewhere */
 function sizePeriod (sec) {
   if (isNaN(sec)) return 20
@@ -312,6 +308,7 @@ WindDataPopup.propTypes = {
 }
 function WaveDataPopup ({ latest_data }) {
   console.log('making wave popup')
+  // console.log({latest_data})
   /* time stamp data */
   return (
     <>
@@ -381,7 +378,7 @@ function make_wave_chart (divId, rawData) {
   // console.log(data)
 
   const data = makeWaveData(rawData)
-  console.log(rawData)
+  // console.log(rawData)
   const w = 275
   const h = 150
   const svg = dimple.newSvg(`#${divId}`, w, h) // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
@@ -438,7 +435,7 @@ function make_wave_chart (divId, rawData) {
 
   myChart.draw()
   const swellArrows = d3.select('.dimple-series-group-0').append('g').selectAll('path').data(rawData)
-  console.log({ swellArrows })
+  // console.log({ swellArrows })
   swellArrows.exit().remove()
   swellArrows.enter().append('path').merge(swellArrows)
     .attr('class', 'dirArrow')
@@ -448,7 +445,7 @@ function make_wave_chart (divId, rawData) {
   function waveDir (d, i) {
     const startX = i * ((w - ml - mr) / rawData.length) + ml - 5
     const deg = cardnalToDegrees(d.SwD)
-    console.log({ deg })
+    // console.log({ deg })
     return `rotate(${deg}, ${startX + 5}, ${100})`
   }
   function drawArrow (d, i) {
@@ -523,7 +520,7 @@ function make_wind_chart (divId, rawData) {
   const windDir = (d) => d.WDIR
   // const direction = parseDirection(parseDegrees(d.WDIR))
   const windArrows = d3.select('.dimple-series-group-0').append('g').selectAll('path').data(rawData)
-  console.log({ windArrows })
+  // console.log({ windArrows })
   windArrows.exit().remove()
   windArrows.enter().append('path').merge(windArrows)
     .attr('class', 'dirArrow')
