@@ -27,7 +27,9 @@ export async function get_nearby_bouy_data (
   console.log({ lat, lng })
   try {
     const res = await fetch(
-      `${process.env.API_SERVER}/wavedata/lat/${lat}/lng/${lng}`
+      `${process.env.API_SERVER}/wavedata/lat/${lat}/lng/${lng}`,{
+        credentials:'include'
+      }
     )
     const { obshder_array, station_id_obj } = await res.json()
     console.log({ obshder_array, station_id_obj })
