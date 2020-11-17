@@ -26,5 +26,27 @@ module.exports = ({
     */
     config.plugins.push(new webpack.DefinePlugin(env));
     return config
-  }
+  },
+  async headers() {
+    return [
+      {
+        source: '/*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: 'true', // Matched parameters can be used in the value
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'true', // Matched parameters can be used in the value
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true', // Matched parameters can be used in the value
+          },
+        
+        ],
+      },
+    ]
+  },
 })
