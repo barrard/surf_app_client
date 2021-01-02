@@ -44,12 +44,12 @@ class LeafletMap extends React.Component {
       this.setState({
         screenOreintation: 'portrait'
       })
-      document.getElementById('map').style.height = '71vh'
+      document.getElementById('map').style.height = '100vh'
     } else {
       this.setState({
         screenOreintation: 'landscape'
       })
-      document.getElementById('map').style.height = '67vh'
+      document.getElementById('map').style.height = '100vh'
     }
   };
 

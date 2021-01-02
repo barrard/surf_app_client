@@ -1,31 +1,32 @@
-import React from 'react';
-import App from 'next/app';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '../src/components/AppBar/AppBar.js';
-import BottomNavigation from '../src/components/BottomNav/BottomNav.js';
-import BottomNavContext from '../src/Context/BottomNavContext.js';
+import React from "react";
+import styled from "styled-components";
+import App from "next/app";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import AppBar from "../src/components/AppBar/AppBar.js";
+import BottomNavigation from "../src/components/BottomNav/BottomNav.js";
+import BottomNavContext from "../src/Context/BottomNavContext.js";
 export default class MyApp extends App {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
-      bottomNavSetting: 0
-    }
+      bottomNavSetting: 0,
+    };
   }
 
-  componentDidMount () {
-    console.log('app mounted')
+  componentDidMount() {
+    console.log("app mounted");
   }
 
-  setBottomNavSetting = val => this.setState({ bottomNavSetting: val });
+  setBottomNavSetting = (val) => this.setState({ bottomNavSetting: val });
 
-  render () {
-    const { Component, pageProps } = this.props
+  render() {
+    const { Component, pageProps } = this.props;
 
     return (
       <BottomNavContext.Provider
         value={{
           bottomNavSetting: this.state.bottomNavSetting,
-          setBottomNavSetting: this.setBottomNavSetting
+          setBottomNavSetting: this.setBottomNavSetting,
         }}
       >
         <>
@@ -35,9 +36,18 @@ export default class MyApp extends App {
           <CssBaseline />
           <Component {...pageProps} />
           {/* </ThemeProvider> */}
-          <BottomNavigation />
+          <BottomNavContainer>
+            <BottomNavigation />
+          </BottomNavContainer>
         </>
       </BottomNavContext.Provider>
-    )
+    );
   }
 }
+
+const BottomNavContainer = styled.div`
+  color: red;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+`;

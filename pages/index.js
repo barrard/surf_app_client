@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from "react";
 // import Link from "next/link";
-import Head from 'next/head'
-import Container from '@material-ui/core/Container'
+import Head from "next/head";
+import Container from "@material-ui/core/Container";
 // import Grid from '@material-ui/core/Grid'
 // import { MyMap } from "../components/Maps/RGM.js";
 // import  MyMap from "../components/Maps/RGM_API.js";
-import LeafMap from '../src/components/Maps/Leaflet_Map.js'
+import LeafMap from "../src/components/Maps/Leaflet_Map.js";
 // import lStyles from 'leaflet/dist/leaflet.css'
-import { ColorsLegend } from '../src/components/colors/colors'
-import BottomNavContext from '../src/Context/BottomNavContext.js'
-import PropTypes from 'prop-types'
-
+import { ColorsLegend } from "../src/components/colors/colors";
+import BottomNavContext from "../src/Context/BottomNavContext.js";
+import PropTypes from "prop-types";
+import LoadingScreen from '../src/components/LoadingOverLay.js'
 // const LeafMap = dynamic(import("../components/Maps/Leaflet_Map.js"), {
 //   ssr: false
 // });
@@ -20,40 +20,38 @@ import {
   getUserLocation,
   useBouys,
   useLocation,
-  get_nearby_bouy_data
-} from '../src/components/utilFunctions.js'
+  get_nearby_bouy_data,
+} from "../src/components/utilFunctions.js";
 
 const Home = () => {
   // const google = window.google;
-
-  const [userLocation, setUserLocation] = useLocation()
+  const [loading, setLoading] = useState(false);
+  const [userLocation, setUserLocation] = useLocation();
   // console.log({ userLocation });
-  const [bouyMarkers, setBouyMarkers] = useBouys([{}])
-  useEffect(() => console.log({ bouyMarkers }))
-  useEffect(() => {
-    console.log('use efect')
-    getUserLocation({ setUserLocation })
-  }, [])
-  useEffect(() => {
-    if (!userLocation) return
-    const { lat, lng } = userLocation
-    get_nearby_bouy_data(
-      lat,
-      lng,
-      bouyMarkers,
-      setBouyMarkers)
-  }, [userLocation])
-  console.log({ bouyMarkers })
+  const [bouyMarkers, setBouyMarkers] = useBouys([{}]);
 
-  const map_click = e => {
-    const { lat, lng } = e.latlng
-    setUserLocation({ lat, lng })
-  }
+  useEffect(() => console.log({ bouyMarkers }));
+  useEffect(() => {
+    console.log("use efect");
+    getUserLocation({ setUserLocation });
+  }, []);
+  useEffect(() => {
+    let mounted = true;
+    if (!userLocation) return;
+    const { lat, lng } = userLocation;
+    setLoading(true);
+    get_nearby_bouy_data(lat, lng, bouyMarkers, setBouyMarkers).then(() => {
+      if (mounted) setLoading(false);
+    });
+    return () => (mounted = false);
+  }, [userLocation]);
+  console.log({ bouyMarkers });
 
-  // const get_buoy_data = (e)=> {
-  //   let { lat, lng } = e.latlng;
-  //   get_nearby_bouy_data(lat, lng,bouyMarkers, setBouyMarkers, setUserLocation);
-  // }
+  const map_click = (e) => {
+    const { lat, lng } = e.latlng;
+    if (loading) return;
+    setUserLocation({ lat, lng });
+  };
 
   return (
     <div>
@@ -61,11 +59,12 @@ const Home = () => {
         <title>Home</title>
       </Head>
       <BottomNavContext.Consumer>
-        {props => {
-          console.log(props)
-          const { bottomNavSetting } = props
+        {(props) => {
+          console.log(props);
+          const { bottomNavSetting } = props;
           return (
             <>
+                {loading && <LoadingScreen/>}
               <LeafMap
                 // useClick={[clicks, setClicks]}
                 bottomNavSetting={bottomNavSetting}
@@ -73,21 +72,22 @@ const Home = () => {
                 buoy_data={bouyMarkers}
                 handleClick={map_click}
               />
-              <Container><ColorsLegend bottomNavSetting={bottomNavSetting} /></Container>
-
+              <Container>
+                <ColorsLegend bottomNavSetting={bottomNavSetting} />
+              </Container>
             </>
-          )
+          );
         }}
       </BottomNavContext.Consumer>
     </div>
-  )
-}
+  );
+};
 
 Home.propTypes = {
-  bottomNavSetting: PropTypes.number
-}
+  bottomNavSetting: PropTypes.number,
+};
 
-export default Home
+export default Home;
 
 // Home.getInitialProps = async(ctx)=>{
 
