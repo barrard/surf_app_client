@@ -77,7 +77,7 @@ export function create_markers(buoy_data, selection, map) {
       );
 
       //this needs to look back a few sometimes
-      const currentData = getCurrentData(buoy_data[station_id] )
+      const currentData = getCurrentData(buoy_data[station_id]);
       /* if wave data selected  //TODO make wind one */
 
       let myIcon, popUp;
@@ -126,21 +126,18 @@ export function create_markers(buoy_data, selection, map) {
   }
 }
 
-function getCurrentData(data, arrayOfProps){
-  let mostCurrentData = {}
-  data = data.slice(0, 20)
-  data.forEach(row=>{
-   
-      for(let prop in row){
-        if(row[prop] && !mostCurrentData[prop]){
-
-            mostCurrentData[prop] = row[prop]
-          
-        }
+function getCurrentData(data, arrayOfProps) {
+  let mostCurrentData = {};
+  data = data.slice(0, 20);
+  data.forEach((row) => {
+    for (let prop in row) {
+      if (row[prop] && !mostCurrentData[prop]) {
+        mostCurrentData[prop] = row[prop];
       }
-  })
-  debugger
-  return mostCurrentData
+    }
+  });
+
+  return mostCurrentData;
 }
 
 function returnWindPopUp(latest_data) {
@@ -283,9 +280,7 @@ function colorTemp(temp) {
   //temp is between 0 50  colors 0-14
   let color = mapNums(temp, 20, 120, 0, 14);
   color = Math.floor(color);
-  console.log(color);
   return colors[color];
-  return color;
 }
 function sizeGust(spd) {
   let size = 25;
@@ -574,22 +569,22 @@ function make_wave_chart(divId, rawData) {
 function make_temperature_chart(divId, rawData) {
   console.log("Making temperature chart");
   /* take in the data and adjust the TIME */
-debugger
+
   const data = makeTempData(rawData);
-  if(!data.length){
-    return
+  if (!data.length) {
+    return;
   }
   const w = 275;
   const h = 150;
   const svg = dimple.newSvg(`#${divId}`, w, h); // data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
   const myChart = new dimple.chart(svg);
   const airTempData = data.filter((d) => {
-    console.log(d.type)
-    console.log(d.type === 'Air Temp')
-    return d.type === 'Air Temp'
-  } );
-  const waterTempData = data.filter((d) => d.type === 'Water Temp');
-debugger
+    console.log(d.type);
+    console.log(d.type === "Air Temp");
+    return d.type === "Air Temp";
+  });
+  const waterTempData = data.filter((d) => d.type === "Water Temp");
+
   const ml = 40;
   const mt = 10;
   const mr = 50;
@@ -616,14 +611,14 @@ debugger
   // myChart.addColorAxis('GST', ['green', 'red'])
   if (!data || !data.length) {
   }
-  debugger
+
   const airTempMin = getMin(data, "F");
   const airTempMax = getMax(data, "F");
   const waterTempMin = getMin(data, "F");
   const waterTempMax = getMax(data, "F");
-  let tempMax = Math.min(airTempMax, waterTempMax)
-  let tempMin = Math.min(airTempMin, waterTempMin)
-  debugger
+  let tempMax = Math.min(airTempMax, waterTempMax);
+  let tempMin = Math.min(airTempMin, waterTempMin);
+
   // console.log({ airTempMax, airTempMin, waterTempMax, waterTempMin })
   // y2.overrideMax = airTempMax + airTempMax * 0.2;
   // y2.overrideMin = airTempMin - airTempMin * 0.2;
@@ -756,9 +751,9 @@ function getMin(data, prop) {
   if (!data.length) {
     return 0;
   }
-  debugger
+
   const _data = data.filter((d) => d[prop] !== undefined);
-  debugger
+
   return parseFloat(
     _data.reduce((min, p) => (p[prop] < min ? p[prop] : min), _data[0][prop])
   );
@@ -773,7 +768,6 @@ function getMax(data, prop) {
   );
 }
 function makeTempData(data) {
-  debugger
   const new_data = [];
   let localTime = convert_GMT_hours(data[0].TIME).timestamp;
 

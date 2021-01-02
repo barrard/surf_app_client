@@ -30,7 +30,7 @@ const Home = () => {
   // console.log({ userLocation });
   const [bouyMarkers, setBouyMarkers] = useBouys([{}]);
 
-  useEffect(() => console.log({ bouyMarkers }));
+  // useEffect(() => console.log({ bouyMarkers }));
   useEffect(() => {
     console.log("use efect");
     getUserLocation({ setUserLocation });
@@ -45,7 +45,7 @@ const Home = () => {
     });
     return () => (mounted = false);
   }, [userLocation]);
-  console.log({ bouyMarkers });
+  // console.log({ bouyMarkers });
 
   const map_click = (e) => {
     const { lat, lng } = e.latlng;

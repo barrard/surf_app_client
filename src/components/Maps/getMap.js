@@ -11,7 +11,7 @@ export default function getMap (handleClick) {
 let markers
 export function add_buoy_markers (buoy_data, selection, map) {
   if (!markers) {
-    console.log({ buoy_data })
+    // console.log({ buoy_data })
     markers = require('./createMap.js').create_markers(buoy_data, selection, map)
   }
 }

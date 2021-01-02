@@ -5,9 +5,9 @@ export default function LoadingOverLay() {
 }
 
 const OverLay = styled.div`
-  /* display: flex;
+  display: flex;
   justify-content: center;
-  align-items: center; */
+  align-items: center;
   font-size: 50px;
   color: white;
   position: absolute;

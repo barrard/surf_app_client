@@ -25,11 +25,11 @@ class LeafletMap extends React.Component {
 
   componentDidUpdate (a, b) {
     const { map } = this.state
-    console.log(this.props)
+    // console.log(this.props)
 
     const { buoy_data } = this.props
     if (buoy_data) {
-      console.log(buoy_data)
+      // console.log(buoy_data)
       add_buoy_markers(buoy_data, this.props.bottomNavSetting, map)
     }
   }

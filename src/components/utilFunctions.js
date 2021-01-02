@@ -46,7 +46,7 @@ export async function get_nearby_bouy_data(
 
 export function useBouys() {
   const [bouyMarkers, setBouyMarkers] = useState(null);
-  console.log({ bouyMarkers });
+  // console.log({ bouyMarkers });
   return [bouyMarkers, setBouyMarkers];
 }
 
