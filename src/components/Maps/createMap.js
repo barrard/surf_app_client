@@ -229,7 +229,9 @@ function return_Wave_Icon(currentData) {
   if (currentData.SwP) period = currentData.SwP;
   else if (currentData.DPD) period = currentData.DPD;
 
+  debugger
   if (currentData.SwD) waveDirection = currentData.SwD;
+  else if (currentData.MWD) waveDirection = parseDegrees(currentData.MWD);
   else if (currentData.WDIR) waveDirection = parseDegrees(currentData.WDIR);
 
   if (currentData.SwH) height = currentData.SwH;
@@ -314,8 +316,8 @@ function cardnalToDegrees(cardnalDir) {
   else return 0;
 }
 
-function parseDirection(compassDirr) {
-  const c = compassDirr;
+function parseDirection(compassDir) {
+  const c = compassDir;
   if (c === "W") return "right";
   else if (c === "SW") return "up-right";
   else if (c === "S") return "up";
